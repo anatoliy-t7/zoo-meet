@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ─── Huddle Design Tokens ─────────────────────────────────────────── */
+/* ─── Video Talk Design Tokens ─────────────────────────────────────────── */
 :root {
   /* Meet surface palette */
   --meet-bg:         oklch(17% 0 0);

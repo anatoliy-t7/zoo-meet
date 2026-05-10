@@ -1,5 +1,5 @@
 const ENC = new TextEncoder();
-const SALT = ENC.encode('huddle-e2ee-v1');
+const SALT = ENC.encode('Video Talk-e2ee-v1');
 const INFO = ENC.encode('e2ee-room-key');
 
 /**
@@ -9,13 +9,9 @@ const INFO = ENC.encode('e2ee-room-key');
  * The key is returned as a base64url string for use with LiveKit's ExternalE2EEKeyProvider.
  */
 export async function deriveE2EEKey(roomId: string): Promise<string> {
-	const keyMaterial = await crypto.subtle.importKey(
-		'raw',
-		ENC.encode(roomId),
-		'HKDF',
-		false,
-		['deriveBits']
-	);
+	const keyMaterial = await crypto.subtle.importKey('raw', ENC.encode(roomId), 'HKDF', false, [
+		'deriveBits',
+	]);
 
 	const bits = await crypto.subtle.deriveBits(
 		{ name: 'HKDF', salt: SALT, info: INFO, hash: 'SHA-256' },

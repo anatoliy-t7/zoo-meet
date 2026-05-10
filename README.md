@@ -1,84 +1,103 @@
-# Huddle
+# Video Talk
 
-Huddle is a secure, open-source video conferencing application powered by LiveKit and SvelteKit.
+Video Talk is a secure, open-source video conferencing application powered by LiveKit and SvelteKit. It is fully self-hosted — no third-party services, no accounts required. Just share a link and start a call.
 
 ## Features
 
-- **End-to-End Encryption** (WebRTC)
-- **Pre-Join Screen**: Setup your microphone and camera before entering the room
-- **Responsive Video Grid**: Auto-scaling layout for multiple participants
-- **Screen Sharing**: Present your screen with a click
-- **Text Chat**: In-call text messages using WebRTC DataChannels
-- **Self-Hosted Backend**: Bundled with a LiveKit server via Docker Compose
+- **End-to-End Encryption** — All media is encrypted via WebRTC SRTP
+- **Pre-Join Screen** — Configure your microphone and camera before entering a room
+- **Responsive Video Grid** — Auto-scaling layout that adapts to any number of participants
+- **Screen Sharing** — Share your screen with a single click
+- **Text Chat** — In-call messaging over WebRTC DataChannels (no server storage)
+- **No Account Required** — Anyone with the link can join instantly
+- **Brandable** — Customize the app name via `PUBLIC_BRAND_NAME`
+- **Self-Hosted Backend** — Bundled LiveKit server and Valkey via Docker Compose
 
 ## Tech Stack
 
-- **Frontend**: SvelteKit, Svelte 5, Tailwind CSS, Lucide Icons
-- **WebRTC Client**: `livekit-client`
-- **Backend / API**: SvelteKit API routes, `livekit-server-sdk`
-- **Infrastructure**: Docker, Docker Compose, LiveKit Server, Valkey
+| Layer | Technology |
+|---|---|
+| Frontend | SvelteKit, Svelte 5, Tailwind CSS, Lucide Icons |
+| WebRTC Client | `livekit-client` |
+| Backend / API | SvelteKit API routes, `livekit-server-sdk` |
+| Infrastructure | Docker, Docker Compose, LiveKit Server, Valkey |
 
 ## Getting Started (Local Development)
 
-The easiest way to get started is by running the entire stack (LiveKit Server, Valkey, and the Huddle App) locally using Docker Compose.
+The easiest way to run the full stack locally is with Docker Compose, which starts LiveKit, Valkey, and the Video Talk app in one command.
 
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and Docker Compose
-- Node.js 22+ (if you wish to run the frontend outside of Docker)
+- Node.js 22+ (only needed if running the frontend outside of Docker)
 
 ### Running the Full Stack
 
-1. Clone the repository and navigate into the project directory:
+1. Clone the repository:
    ```bash
    git clone https://github.com/suitenumerique/meet.git
-   cd huddle
+   cd Video Talk
    ```
 
-2. Start the Docker Compose stack:
+2. Start everything:
    ```bash
    docker compose up --build
    ```
 
-   This will spin up three containers:
-   - `livekit`: The WebRTC backend (binding to ports `7880`, `7881`, and `50000-50050/udp`)
-   - `valkey`: State storage for LiveKit
-   - `huddle`: The SvelteKit frontend web application
+   This starts three containers:
+   - `livekit` — WebRTC media server (ports `7880`, `7881`, `50000–50050/udp`)
+   - `valkey` — In-memory state store for LiveKit
+   - `Video Talk` — SvelteKit web application
 
-3. Open your browser and navigate to **[http://localhost:3000](http://localhost:3000)**.
+3. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-### Running Frontend Separately (Without Docker for Huddle)
+### Running the Frontend Separately (HMR / Dev Mode)
 
-If you prefer to run the SvelteKit app locally for development (with Hot Module Replacement) while only running LiveKit in Docker:
+If you want hot module replacement during development, run LiveKit in Docker and the frontend locally:
 
-1. Start only LiveKit and Valkey:
+1. Start only the backend services:
    ```bash
    docker compose up livekit valkey -d
    ```
 
-2. Install dependencies using `pnpm`:
+2. Install dependencies:
    ```bash
    pnpm install
    ```
 
-3. Start the development server:
+3. Start the dev server:
    ```bash
    pnpm dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173`.
+4. Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 ## Environment Variables
 
-The project comes with a `.env` file pre-configured for local development. If you deploy this to production, you must update these values:
+The project ships with a `.env` file pre-configured for local development:
 
 ```env
+# LiveKit server credentials — must match your LiveKit config
 LIVEKIT_API_KEY=devkey
 LIVEKIT_API_SECRET=secret
+
+# WebSocket URL of the LiveKit server (use wss:// in production)
 PUBLIC_LIVEKIT_URL=ws://127.0.0.1:7880
+
+# Brand name shown in the UI, page titles, and OG meta tags
+PUBLIC_BRAND_NAME=Video Talk
 ```
 
-> **Note**: For production deployments, `PUBLIC_LIVEKIT_URL` should point to your public LiveKit instance (e.g., `wss://livekit.yourdomain.com`).
+### Variable Reference
+
+| Variable | Required | Description |
+|---|---|---|
+| `LIVEKIT_API_KEY` | Yes | API key used to sign LiveKit access tokens (server-side only) |
+| `LIVEKIT_API_SECRET` | Yes | API secret used to sign LiveKit access tokens (server-side only) |
+| `PUBLIC_LIVEKIT_URL` | Yes | WebSocket URL of your LiveKit server, visible to the browser |
+| `PUBLIC_BRAND_NAME` | No | App name rendered in the UI, `<title>`, and Open Graph tags. Defaults to `Video Talk` |
+
+> **Production note**: Set `PUBLIC_LIVEKIT_URL` to your public LiveKit instance (e.g., `wss://livekit.yourdomain.com`) and replace the default `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` with strong, randomly generated values.
 
 ## License
 

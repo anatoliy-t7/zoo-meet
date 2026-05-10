@@ -85,7 +85,7 @@
 			</div>
 
 			<a
-				href="https://github.com/anatoliy-t7/huddle"
+				href="https://github.com/anatoliy-t7/Video Talk"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="border-border text-muted-foreground hover:text-foreground hover:bg-accent flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition-colors"
@@ -187,7 +187,7 @@
 
 			<div class="text-muted-foreground flex items-center gap-6 text-sm">
 				<a
-					href="https://github.com/anatoliy-t7/huddle"
+					href="https://github.com/anatoliy-t7/Video Talk"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="hover:text-foreground flex items-center gap-1.5 transition-colors"
