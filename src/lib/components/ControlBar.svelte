@@ -236,9 +236,9 @@
 		<!-- ── Screen Share ── -->
 		<Button
 			onclick={() => lkState.toggleScreenShare()}
-			class="h-12 w-12 rounded-full border-none shadow-none transition-colors {lkState.isScreenSharing
-				? 'bg-meet-btn-active text-meet-text'
-				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
+			class={lkState.isScreenSharing ? 'bg-meet-btn-active text-meet-text' : ''}
+			size="icon-lg"
+			variant="secondary"
 			aria-label="Share screen"
 		>
 			<Icon icon={ComputerScreenShareIcon} />
@@ -247,10 +247,9 @@
 		<!-- ── Participants ── -->
 		<Button
 			onclick={() => toggleSidebar('participants')}
-			class="relative h-12 w-12 rounded-full border-none shadow-none transition-colors {activeSidebar ===
-			'participants'
-				? 'bg-meet-btn-active text-meet-text'
-				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
+			class="relative {activeSidebar === 'participants' ? 'bg-meet-btn-active text-meet-text' : ''}"
+			size="icon-lg"
+			variant="secondary"
 			aria-label="Participants"
 		>
 			<Icon icon={UserGroupIcon} />
@@ -278,10 +277,9 @@
 			<!-- Button shows ✋ when hand is raised, smile otherwise -->
 			<Button
 				onclick={toggleReactions}
-				class="relative h-12 w-12 rounded-full border-none shadow-none transition-colors {isReactionsOpen ||
-				isHandRaised
-					? 'bg-meet-btn-active text-meet-text'
-					: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
+				class={isReactionsOpen || isHandRaised ? 'bg-meet-btn-active text-meet-text' : ''}
+				size="icon-lg"
+				variant="secondary"
 				aria-label="Reactions"
 				aria-expanded={isReactionsOpen}
 			>
@@ -299,7 +297,7 @@
 					<!-- Regular reaction emojis (auto-dismiss after 5 s) -->
 					{#each REACTIONS as emoji (emoji)}
 						<button
-							class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125"
+							class="flex size-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125"
 							onclick={() => {
 								toggleReactions();
 								lkState.sendReaction(emoji);
@@ -314,7 +312,7 @@
 
 					<!-- Raise hand — persistent until dismissed -->
 					<button
-						class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125 {isHandRaised
+						class="flex size-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125 {isHandRaised
 							? 'bg-meet-btn'
 							: ''}"
 						onclick={() => {
@@ -341,10 +339,9 @@
 		<!-- ── Settings ── -->
 		<Button
 			onclick={() => toggleSidebar('settings')}
-			class="h-12 w-12 rounded-full border-none shadow-none transition-colors {activeSidebar ===
-			'settings'
-				? 'bg-meet-btn-active text-meet-text'
-				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
+			class={activeSidebar === 'settings' ? 'bg-meet-btn-active text-meet-text' : ''}
+			size="icon-lg"
+			variant="secondary"
 			aria-label="Settings"
 		>
 			<Icon icon={Settings01Icon} />
