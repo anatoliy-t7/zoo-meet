@@ -104,7 +104,11 @@
 		await lkState.switchCamera(deviceId);
 	}
 
-	const REACTIONS = ['👍', '👎', '👏', '👋', '❤️', '🎉'];
+	const REACTIONS = ['👍', '👎', '👏', '❤️', '🎉'];
+
+	let isHandRaised = $derived(
+		lkState.raisedHands.has(lkState.room?.localParticipant.identity ?? '')
+	);
 </script>
 
 <div class="pointer-events-auto z-10 flex h-20 shrink-0 items-center px-6">
@@ -271,32 +275,58 @@
 
 		<!-- ── Reactions ── -->
 		<div class="relative" data-reactions>
+			<!-- Button shows ✋ when hand is raised, smile otherwise -->
 			<Button
 				onclick={toggleReactions}
-				class="h-12 w-12 rounded-full border-none shadow-none transition-colors {isReactionsOpen
+				class="relative h-12 w-12 rounded-full border-none shadow-none transition-colors {isReactionsOpen ||
+				isHandRaised
 					? 'bg-meet-btn-active text-meet-text'
 					: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
 				aria-label="Reactions"
 				aria-expanded={isReactionsOpen}
 			>
-				<Icon icon={SmileIcon} />
+				{#if isHandRaised}
+					<span class="text-2xl leading-none">✋</span>
+				{:else}
+					<Icon icon={SmileIcon} />
+				{/if}
 			</Button>
 
 			{#if isReactionsOpen}
 				<div
-					class="bg-meet-panel border-meet-border absolute bottom-[calc(100%+8px)] left-1/2 flex -translate-x-1/2 gap-1 rounded-full border px-3 py-2 shadow-xl"
+					class="bg-meet-panel border-meet-border absolute bottom-[calc(100%+8px)] left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border px-3 py-2 shadow-xl"
 				>
+					<!-- Regular reaction emojis (auto-dismiss after 5 s) -->
 					{#each REACTIONS as emoji (emoji)}
 						<button
-							class="flex h-9 w-9 items-center justify-center rounded-full text-lg transition-transform hover:scale-125"
+							class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125"
 							onclick={() => {
 								toggleReactions();
-								lkState.sendMessage(emoji);
+								lkState.sendReaction(emoji);
 							}}
 						>
 							{emoji}
 						</button>
 					{/each}
+
+					<!-- Divider -->
+					<div class="bg-meet-border mx-1 h-6 w-px shrink-0"></div>
+
+					<!-- Raise hand — persistent until dismissed -->
+					<button
+						class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-2xl transition-transform hover:scale-125 {isHandRaised
+							? 'bg-meet-btn'
+							: ''}"
+						onclick={() => {
+							toggleReactions();
+							lkState.toggleRaiseHand();
+						}}
+						aria-label={isHandRaised ? 'Lower hand' : 'Raise hand'}
+						title={isHandRaised ? 'Lower hand' : 'Raise hand'}
+					>
+						✋
+					</button>
+
 					<!-- Caret -->
 					<div
 						class="border-t-meet-border absolute -bottom-2 left-1/2 -translate-x-1/2 border-x-8 border-t-8 border-b-0 border-solid border-x-transparent"

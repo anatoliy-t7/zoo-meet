@@ -9,6 +9,7 @@ import {
 	type RemoteTrackPublication,
 } from 'livekit-client';
 import { BackgroundBlur, supportsBackgroundProcessors } from '@livekit/track-processors';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { z } from 'zod';
 
 export type ChatMessage = {
@@ -27,6 +28,16 @@ const inboundChatSchema = z.object({
 const inboundLockSchema = z.object({
 	type: z.literal('lock'),
 	locked: z.boolean(),
+});
+
+const inboundReactionSchema = z.object({
+	type: z.literal('reaction'),
+	emoji: z.string().min(1).max(10),
+});
+
+const inboundRaiseHandSchema = z.object({
+	type: z.literal('raise-hand'),
+	raised: z.boolean(),
 });
 
 /** Cryptographically random hex ID for messages. */
@@ -49,6 +60,14 @@ export class LiveKitState {
 	isBlurEnabled: boolean = $state(false);
 	/** Whether the meeting is locked (no new participants). */
 	isLocked: boolean = $state(false);
+	/** Active emoji reactions keyed by participant identity. Cleared after 5 s. */
+	activeReactions: SvelteMap<string, string> = new SvelteMap();
+	/** Participant identities that have raised their hand. */
+	raisedHands: SvelteSet<string> = new SvelteSet();
+
+	/** Per-identity timers for clearing reactions. Not reactive — internal only. */
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive timer map
+	private reactionTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
 	private updateParticipants() {
 		if (!this.room) return;
@@ -61,6 +80,8 @@ export class LiveKitState {
 	triggerTrackChange() {
 		this.trackChangeCount++;
 		this.updateParticipants();
+		// Sync with actual track state so external "Stop sharing" is caught too
+		this.isScreenSharing = this.room?.localParticipant.isScreenShareEnabled ?? false;
 	}
 
 	/**
@@ -127,6 +148,22 @@ export class LiveKitState {
 					const lock = inboundLockSchema.safeParse(raw);
 					if (lock.success) {
 						this.isLocked = lock.data.locked;
+						return;
+					}
+
+					const reaction = inboundReactionSchema.safeParse(raw);
+					if (reaction.success && participant?.identity) {
+						this.applyReaction(participant.identity, reaction.data.emoji);
+						return;
+					}
+
+					const hand = inboundRaiseHandSchema.safeParse(raw);
+					if (hand.success && participant?.identity) {
+						if (hand.data.raised) {
+							this.raisedHands.add(participant.identity);
+						} else {
+							this.raisedHands.delete(participant.identity);
+						}
 					}
 				} catch {
 					// Malformed packet — silently drop
@@ -158,6 +195,45 @@ export class LiveKitState {
 		this.e2eeEnabled = false;
 		this.isBlurEnabled = false;
 		this.isLocked = false;
+		this.activeReactions.clear();
+		this.raisedHands.clear();
+		this.reactionTimers.forEach((t) => clearTimeout(t));
+		this.reactionTimers.clear();
+	}
+
+	/** Schedule an emoji reaction to disappear from a tile after 5 s. */
+	private applyReaction(identity: string, emoji: string) {
+		const existing = this.reactionTimers.get(identity);
+		if (existing) clearTimeout(existing);
+		this.activeReactions.set(identity, emoji);
+		const timer = setTimeout(() => {
+			this.activeReactions.delete(identity);
+			this.reactionTimers.delete(identity);
+		}, 5000);
+		this.reactionTimers.set(identity, timer);
+	}
+
+	/** Send a floating emoji reaction visible to all participants for 5 seconds. */
+	sendReaction(emoji: string) {
+		if (!this.room) return;
+		const identity = this.room.localParticipant.identity;
+		this.applyReaction(identity, emoji);
+		const payload = new TextEncoder().encode(JSON.stringify({ type: 'reaction', emoji }));
+		this.room.localParticipant.publishData(payload, { reliable: false });
+	}
+
+	/** Toggle raise-hand state and broadcast to all participants. */
+	toggleRaiseHand() {
+		if (!this.room) return;
+		const identity = this.room.localParticipant.identity;
+		const raised = !this.raisedHands.has(identity);
+		if (raised) {
+			this.raisedHands.add(identity);
+		} else {
+			this.raisedHands.delete(identity);
+		}
+		const payload = new TextEncoder().encode(JSON.stringify({ type: 'raise-hand', raised }));
+		this.room.localParticipant.publishData(payload, { reliable: true });
 	}
 
 	async toggleMicrophone() {
@@ -190,7 +266,6 @@ export class LiveKitState {
 		if (!this.room) return;
 		const enabled = this.room.localParticipant.isScreenShareEnabled;
 		await this.room.localParticipant.setScreenShareEnabled(!enabled);
-		this.isScreenSharing = !enabled;
 		this.triggerTrackChange();
 	}
 

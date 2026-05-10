@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { PUBLIC_BRAND_NAME } from '$env/static/public';
 	import { generateRoomId } from '$lib/utils/id';
 	import Icon from '$lib/components/Icon.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -53,6 +54,26 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{PUBLIC_BRAND_NAME} — Free, Private Video Calls</title>
+	<meta
+		name="description"
+		content="One link. No sign-up. No downloads. Meet face-to-face from anywhere — every call is end-to-end encrypted so only the people in the room can see or hear anything."
+	/>
+	<meta property="og:title" content="{PUBLIC_BRAND_NAME} — Free, Private Video Calls" />
+	<meta
+		property="og:description"
+		content="Start a secure video meeting in seconds. No account, no downloads. Every call is end-to-end encrypted."
+	/>
+	<meta property="og:image" content="/hero.webp" />
+	<meta name="twitter:title" content="{PUBLIC_BRAND_NAME} — Free, Private Video Calls" />
+	<meta
+		name="twitter:description"
+		content="Start a secure video meeting in seconds. No account, no downloads. Every call is end-to-end encrypted."
+	/>
+	<meta name="twitter:image" content="/hero.webp" />
+</svelte:head>
+
 <div class="bg-background text-foreground min-h-screen font-sans">
 	<div class="border-border border-b">
 		<nav class=" mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
@@ -60,7 +81,7 @@
 				<div class="bg-primary flex size-8 items-center justify-center rounded-full">
 					<Icon icon={Video01Icon} size={18} color="black" />
 				</div>
-				<span class="text-lg font-semibold tracking-tight">Huddle</span>
+				<span class="text-lg font-semibold tracking-tight">{PUBLIC_BRAND_NAME}</span>
 			</div>
 
 			<a
@@ -79,18 +100,18 @@
 		</nav>
 	</div>
 
-	<main class="mx-auto max-w-7xl px-6 pt-20 pb-16 lg:flex lg:items-center lg:gap-16">
+	<main class="mx-auto max-w-7xl px-6 py-32 lg:flex lg:items-center lg:gap-16">
 		<div class="lg:w-1/2">
 			<h1 class="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
-				Secure video calls that keep your conversations private
+				Meet face-to-face,<br />from anywhere on Earth.
 			</h1>
-			<p class="text-muted-foreground mb-10 text-lg">
-				Collaborate with your team and catch up with friends. Every meeting is end-to-end encrypted
-				— only people in the room can see or hear anything.
+			<p class="text-muted-foreground mb-10 text-lg leading-relaxed">
+				One link. No sign-up. No downloads. Your conversation stays between you — every call is
+				end-to-end encrypted, so nobody else can listen in.
 			</p>
 
 			<div class="flex flex-col gap-4 sm:flex-row">
-				<Button onclick={handleStartMeeting}>
+				<Button onclick={handleStartMeeting} size="lg">
 					<Icon icon={Video01Icon} />
 
 					New meeting
@@ -106,14 +127,15 @@
 						type="text"
 						bind:value={joinCode}
 						onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleJoinMeeting()}
-						class="focus-visible:border-ring rounded-l-full rounded-r-none border-r-0 pl-12 focus-visible:ring-0"
+						class="focus-visible:border-ring h-14 rounded-l-full rounded-r-none border-r-0 pl-14 text-lg focus-visible:ring-0"
 						placeholder="Enter a code or link"
 					/>
 					<Button
 						onclick={handleJoinMeeting}
 						disabled={!joinCode.trim()}
 						variant="secondary"
-						class="border-border rounded-l-none rounded-r-full border border-l-0"
+						size="lg"
+						class="border-border rounded-l-none border border-l-0"
 					>
 						Join
 					</Button>
@@ -122,29 +144,15 @@
 		</div>
 
 		<div class="hidden lg:block lg:w-1/2">
-			<div
-				class="bg-popover border-border relative flex aspect-video items-center justify-center overflow-hidden rounded-3xl border p-8 shadow-2xl"
-			>
-				<div
-					class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,white,transparent)] opacity-[0.07]"
-				></div>
-				<div
-					class="border-border flex h-full w-full items-center justify-center rounded-3xl border-2 border-dashed"
-				>
-					<div class="text-muted-foreground flex flex-col items-center gap-4">
-						<div class="flex gap-4">
-							{#each [0, 1, 2] as _idx (_idx)}
-								<div class="bg-card size-24 rounded-full shadow-sm"></div>
-							{/each}
-						</div>
-						<div class="flex gap-4">
-							<div class="bg-card size-24 rounded-full shadow-sm"></div>
-							<div
-								class="bg-secondary border-primary size-24 rounded-full border-2 shadow-sm"
-							></div>
-						</div>
-					</div>
-				</div>
+			<div class="relative overflow-hidden rounded-3xl shadow-2xl">
+				<img
+					src="/hero.webp"
+					alt="{PUBLIC_BRAND_NAME} video call interface"
+					class="w-full object-cover"
+					width="1280"
+					height="720"
+					fetchpriority="high"
+				/>
 			</div>
 		</div>
 	</main>
@@ -173,7 +181,7 @@
 				<div class="bg-primary flex size-6 items-center justify-center rounded-full">
 					<Icon icon={Video01Icon} size={13} color="black" />
 				</div>
-				<span class="text-sm font-semibold">Huddle</span>
+				<span class="text-sm font-semibold">{PUBLIC_BRAND_NAME}</span>
 				<span class="text-muted-foreground text-sm">— free, open-source video calls</span>
 			</div>
 
@@ -191,7 +199,7 @@
 					</svg>
 					View source
 				</a>
-				<span>© {new Date().getFullYear()} Huddle</span>
+				<span>© {new Date().getFullYear()} {PUBLIC_BRAND_NAME}</span>
 			</div>
 		</div>
 	</footer>

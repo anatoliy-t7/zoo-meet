@@ -19,8 +19,8 @@
   --meet-red-hover:  oklch(66% 0.22 25.7);
 
   /* Brand — yellow */
-  --brand:           oklch(0.795 0.184 86);  /* yellow-500 */
-  --brand-dark:      oklch(0.720 0.180 86);  /* yellow-600 */
+  --brand:           oklch(88% 0.18 95);
+  --brand-dark:      oklch(88% 0.18 95);
 
   /* ─── shadcn semantic tokens (mapped to meet palette) ────────────── */
   --background:           var(--meet-bg);

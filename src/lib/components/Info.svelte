@@ -5,31 +5,18 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Cancel01Icon, Copy01Icon, Tick01Icon } from '@hugeicons/core-free-icons';
-	import { onDestroy } from 'svelte';
+	import { Cancel01Icon } from '@hugeicons/core-free-icons';
 	import { page } from '$app/stores';
+	import Clipboard from '$lib/components/ui/clipboard/clipboard.svelte';
 
 	let { lkState, onClose } = $props<{ lkState: LiveKitState; onClose: () => void }>();
 
-	let copied = $state(false);
-	let copyTimer: ReturnType<typeof setTimeout> | null = null;
 	let meetingUrl = $derived(typeof window !== 'undefined' ? window.location.href : $page.url.href);
 	let joinedAt = new Date().toLocaleTimeString([], {
 		hour: '2-digit',
 		minute: '2-digit',
 		second: '2-digit',
 	});
-
-	onDestroy(() => {
-		if (copyTimer) clearTimeout(copyTimer);
-	});
-
-	async function handleCopy() {
-		await navigator.clipboard.writeText(meetingUrl);
-		copied = true;
-		if (copyTimer) clearTimeout(copyTimer);
-		copyTimer = setTimeout(() => (copied = false), 2000);
-	}
 </script>
 
 <div class="text-foreground flex h-full flex-col">
@@ -58,16 +45,11 @@
 						<span class="text-right font-mono break-all">{lkState.room?.name ?? ''}</span>
 					</div>
 					<div>
-						<span class="text-muted-foreground mb-1 block">Invite link</span>
-						<button
-							onclick={handleCopy}
-							class="text-primary group flex w-full items-start gap-2 text-left hover:underline"
-						>
-							<span class="flex-1 text-xs break-all">{meetingUrl}</span>
-							<span class="mt-0.5 shrink-0 transition-transform group-hover:scale-110">
-								<Icon icon={copied ? Tick01Icon : Copy01Icon} size={14} color="currentColor" />
-							</span>
-						</button>
+						<span class="text-muted-foreground block">Invite link</span>
+						<div class="flex items-center gap-1">
+							<span class="text-primary flex-1 break-all">{meetingUrl}</span>
+							<Clipboard text={meetingUrl} />
+						</div>
 					</div>
 				</div>
 			</div>

@@ -58,24 +58,11 @@
 	});
 
 	onMount(async () => {
-		// Query existing permission state without triggering a browser prompt
-		let videoGranted = false;
-		let audioGranted = false;
-		try {
-			const [camPerm, micPerm] = await Promise.all([
-				navigator.permissions.query({ name: 'camera' as PermissionName }),
-				navigator.permissions.query({ name: 'microphone' as PermissionName }),
-			]);
-			videoGranted = camPerm.state === 'granted';
-			audioGranted = micPerm.state === 'granted';
-		} catch {
-			// Permissions API not supported (e.g. Firefox) — leave both false
-		}
-
-		// Auto-start whichever tracks are already permitted, in parallel
+		// Always request both devices on load — triggers the browser permission prompt
+		// on first visit and silently auto-enables on return visits.
 		const [videoResult, audioResult] = await Promise.allSettled([
-			videoGranted ? createLocalVideoTrack() : Promise.reject(),
-			audioGranted ? createLocalAudioTrack() : Promise.reject(),
+			createLocalVideoTrack(),
+			createLocalAudioTrack(),
 		]);
 
 		if (videoResult.status === 'fulfilled') {
@@ -87,7 +74,7 @@
 			isAudioEnabled = true;
 		}
 
-		// Enumerate devices — full labels are now available if any permission was held
+		// Enumerate devices — labels are available now that permission has been granted
 		try {
 			videoDevices = await Room.getLocalDevices('videoinput');
 			if (videoDevices.length > 0) selectedVideoDevice = videoDevices[0].deviceId;
@@ -259,7 +246,7 @@
 
 		<!-- Right: Join form -->
 		<div class="flex w-full flex-col pt-8 md:w-[400px] md:pt-0">
-			<h2 class="mb-3 text-center text-[28px] font-semibold md:text-left">Talk confidentially</h2>
+			<h2 class="mb-3 text-center text-3xl font-semibold">Join room</h2>
 			<p class="text-muted-foreground mb-5 text-center text-[15px] leading-relaxed md:text-left">
 				End-to-end encrypted — only participants in this meeting can see or hear anything.
 			</p>

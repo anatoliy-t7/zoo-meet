@@ -7,7 +7,7 @@
 	import PreJoin from '$lib/components/PreJoin.svelte';
 	import Room from '$lib/components/Room.svelte';
 	import { onDestroy } from 'svelte';
-	import { PUBLIC_LIVEKIT_URL } from '$env/static/public';
+	import { PUBLIC_LIVEKIT_URL, PUBLIC_BRAND_NAME } from '$env/static/public';
 
 	const roomId = $page.params.room ?? '';
 
@@ -61,7 +61,12 @@
 </script>
 
 <svelte:head>
-	<title>Huddle - {roomId}</title>
+	<title>{PUBLIC_BRAND_NAME} — Join meeting {roomId}</title>
+	<meta name="description" content="You've been invited to a {PUBLIC_BRAND_NAME} video call. Join now — no account or download required." />
+	<meta name="robots" content="noindex, nofollow" />
+	<meta property="og:title" content="Join a {PUBLIC_BRAND_NAME} meeting" />
+	<meta property="og:description" content="You've been invited to a secure, end-to-end encrypted video call on {PUBLIC_BRAND_NAME}. Join in one click." />
+	<meta property="og:image" content="/hero.webp" />
 </svelte:head>
 
 {#if !joined}
