@@ -1,6 +1,6 @@
-# Video Talk
+# ZooMeet
 
-Video Talk is a secure, open-source video conferencing application powered by LiveKit and SvelteKit. It is fully self-hosted — no third-party services, no accounts required. Just share a link and start a call.
+ZooMeet is a secure, open-source video conferencing application powered by LiveKit and SvelteKit. It is fully self-hosted — no third-party services, no accounts required. Just share a link and start a call.
 
 ## Features
 
@@ -24,7 +24,7 @@ Video Talk is a secure, open-source video conferencing application powered by Li
 
 ## Getting Started (Local Development)
 
-The easiest way to run the full stack locally is with Docker Compose, which starts LiveKit, Valkey, and the Video Talk app in one command.
+The easiest way to run the full stack locally is with Docker Compose, which starts LiveKit, Valkey, and the ZooMeet app in one command.
 
 ### Prerequisites
 
@@ -36,7 +36,7 @@ The easiest way to run the full stack locally is with Docker Compose, which star
 1. Clone the repository:
    ```bash
    git clone https://github.com/suitenumerique/meet.git
-   cd Video Talk
+   cd ZooMeet
    ```
 
 2. Start everything:
@@ -47,7 +47,7 @@ The easiest way to run the full stack locally is with Docker Compose, which star
    This starts three containers:
    - `livekit` — WebRTC media server (ports `7880`, `7881`, `50000–50050/udp`)
    - `valkey` — In-memory state store for LiveKit
-   - `Video Talk` — SvelteKit web application
+   - `ZooMeet` — SvelteKit web application
 
 3. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
@@ -85,7 +85,7 @@ LIVEKIT_API_SECRET=secret
 PUBLIC_LIVEKIT_URL=ws://127.0.0.1:7880
 
 # Brand name shown in the UI, page titles, and OG meta tags
-PUBLIC_BRAND_NAME=Video Talk
+PUBLIC_BRAND_NAME=ZooMeet
 ```
 
 ### Variable Reference
@@ -95,7 +95,7 @@ PUBLIC_BRAND_NAME=Video Talk
 | `LIVEKIT_API_KEY` | Yes | API key used to sign LiveKit access tokens (server-side only) |
 | `LIVEKIT_API_SECRET` | Yes | API secret used to sign LiveKit access tokens (server-side only) |
 | `PUBLIC_LIVEKIT_URL` | Yes | WebSocket URL of your LiveKit server, visible to the browser |
-| `PUBLIC_BRAND_NAME` | No | App name rendered in the UI, `<title>`, and Open Graph tags. Defaults to `Video Talk` |
+| `PUBLIC_BRAND_NAME` | No | App name rendered in the UI, `<title>`, and Open Graph tags. Defaults to `ZooMeet` |
 
 > **Production note**: Set `PUBLIC_LIVEKIT_URL` to your public LiveKit instance (e.g., `wss://livekit.yourdomain.com`) and replace the default `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` with strong, randomly generated values.
 

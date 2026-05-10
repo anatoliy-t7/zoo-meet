@@ -1,5 +1,5 @@
 const ENC = new TextEncoder();
-const SALT = ENC.encode('Video Talk-e2ee-v1');
+const SALT = ENC.encode('ZooMeet-e2ee-v1');
 const INFO = ENC.encode('e2ee-room-key');
 
 /**

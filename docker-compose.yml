@@ -18,7 +18,7 @@ services:
     ports:
       - "6379:6379"
 
-  videotalk:
+  zoomeet:
     build: .
     restart: unless-stopped
     ports:
