@@ -3,13 +3,18 @@
 	import { cn } from '$lib/utils';
 	import type { SelectTriggerProps } from 'bits-ui';
 
-	let { ref = $bindable(null), class: className, children, ...restProps }: SelectTriggerProps = $props();
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: SelectTriggerProps = $props();
 </script>
 
 <Select.Trigger
 	bind:ref
 	class={cn(
-		'border-input bg-card text-foreground placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate',
+		'border-input bg-card text-foreground placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-full border px-3 py-2 text-sm focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate',
 		className
 	)}
 	{...restProps}

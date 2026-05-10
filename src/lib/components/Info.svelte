@@ -14,7 +14,11 @@
 	let copied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | null = null;
 	let meetingUrl = $derived(typeof window !== 'undefined' ? window.location.href : $page.url.href);
-	let joinedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+	let joinedAt = new Date().toLocaleTimeString([], {
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+	});
 
 	onDestroy(() => {
 		if (copyTimer) clearTimeout(copyTimer);
@@ -28,10 +32,16 @@
 	}
 </script>
 
-<div class="flex flex-col h-full bg-popover text-foreground">
-	<div class="h-16 flex items-center justify-between px-5 shrink-0">
-		<h3 class="font-semibold text-lg">Info</h3>
-		<Button variant="ghost" size="icon" onclick={onClose} class="rounded-full" aria-label="Close info">
+<div class="text-foreground flex h-full flex-col">
+	<div class="flex h-16 shrink-0 items-center justify-between px-5">
+		<h3 class="text-lg font-semibold">Info</h3>
+		<Button
+			variant="ghost"
+			size="icon"
+			onclick={onClose}
+			class="rounded-full"
+			aria-label="Close info"
+		>
 			<Icon icon={Cancel01Icon} size={18} />
 		</Button>
 	</div>
@@ -40,21 +50,21 @@
 	<ScrollArea class="flex-1 p-5">
 		<div class="space-y-4">
 			<!-- Meeting details -->
-			<div class="bg-card rounded-xl p-4 space-y-3">
-				<p class="text-xs uppercase tracking-widest text-muted-foreground">Meeting details</p>
+			<div class="bg-card space-y-3 rounded-xl p-4">
+				<p class="text-muted-foreground text-xs tracking-widest uppercase">Meeting details</p>
 				<div class="space-y-3 text-sm">
-					<div class="flex justify-between gap-4 items-center">
+					<div class="flex items-center justify-between gap-4">
 						<span class="text-muted-foreground shrink-0">Room</span>
-						<span class="font-mono text-right break-all">{lkState.room?.name ?? ''}</span>
+						<span class="text-right font-mono break-all">{lkState.room?.name ?? ''}</span>
 					</div>
 					<div>
-						<span class="text-muted-foreground block mb-1">Invite link</span>
+						<span class="text-muted-foreground mb-1 block">Invite link</span>
 						<button
 							onclick={handleCopy}
-							class="flex items-start gap-2 text-primary hover:underline w-full text-left group"
+							class="text-primary group flex w-full items-start gap-2 text-left hover:underline"
 						>
-							<span class="text-xs break-all flex-1">{meetingUrl}</span>
-							<span class="shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
+							<span class="flex-1 text-xs break-all">{meetingUrl}</span>
+							<span class="mt-0.5 shrink-0 transition-transform group-hover:scale-110">
 								<Icon icon={copied ? Tick01Icon : Copy01Icon} size={14} color="currentColor" />
 							</span>
 						</button>
@@ -63,15 +73,19 @@
 			</div>
 
 			<!-- Participants -->
-			<div class="bg-card rounded-xl p-4 space-y-3">
+			<div class="bg-card space-y-3 rounded-xl p-4">
 				<div class="flex items-center gap-2">
-					<p class="text-xs uppercase tracking-widest text-muted-foreground">Participants</p>
-					<Badge variant="secondary" class="text-xs px-1.5 py-0 h-4">{lkState.participants.length}</Badge>
+					<p class="text-muted-foreground text-xs tracking-widest uppercase">Participants</p>
+					<Badge variant="secondary" class="h-4 px-1.5 py-0 text-xs"
+						>{lkState.participants.length}</Badge
+					>
 				</div>
 				<div class="space-y-2">
 					{#each lkState.participants as p (p.sid || p.identity)}
 						<div class="flex items-center gap-3 text-sm">
-							<div class="size-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold uppercase text-xs shrink-0">
+							<div
+								class="bg-primary text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold uppercase"
+							>
 								{p.identity.charAt(0)}
 							</div>
 							<span>{p.identity}{p.isLocal ? ' (You)' : ''}</span>
@@ -81,10 +95,10 @@
 			</div>
 
 			<!-- Activity -->
-			<div class="bg-card rounded-xl p-4 space-y-3">
-				<p class="text-xs uppercase tracking-widest text-muted-foreground">Activity</p>
+			<div class="bg-card space-y-3 rounded-xl p-4">
+				<p class="text-muted-foreground text-xs tracking-widest uppercase">Activity</p>
 				<div class="flex gap-4 text-sm">
-					<span class="text-muted-foreground font-mono shrink-0">{joinedAt}</span>
+					<span class="text-muted-foreground shrink-0 font-mono">{joinedAt}</span>
 					<span>Joined room</span>
 				</div>
 			</div>

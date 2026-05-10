@@ -30,6 +30,8 @@ export default ts.config(
 		rules: {
 			// goto() without resolve() is fine in SvelteKit page-level navigation
 			'svelte/no-navigation-without-resolve': 'off',
+			// TypeScript already tracks undefined names; no-undef produces false positives for DOM types
+			'no-undef': 'off',
 		},
 	},
 	{

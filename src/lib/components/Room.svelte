@@ -82,62 +82,54 @@
 		<!-- Main Video Area -->
 		<div class="flex min-w-0 flex-1 flex-col">
 			<!-- Top status badges -->
-			<div class="pointer-events-none absolute top-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
-				{#if lkState.e2eeEnabled}
-					<div class="border-brand/30 bg-meet-panel/90 text-brand flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium backdrop-blur-sm">
-						<Icon icon={LockPasswordIcon} size={13} />
-						End-to-end encrypted
-					</div>
-				{/if}
+			<div
+				class="pointer-events-none absolute top-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2"
+			>
 				{#if lkState.isLocked}
-					<div class="bg-meet-red/90 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+					<div
+						class="bg-meet-red/90 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white backdrop-blur-sm"
+					>
 						<Icon icon={LockPasswordIcon} size={13} />
 						Meeting locked
 					</div>
 				{/if}
 			</div>
 
-			<div class="flex-1 overflow-hidden p-4">
+			<div class="flex-1 overflow-hidden p-4 pb-0">
 				<VideoGrid {lkState} {hideSelf} />
 			</div>
 
 			<!-- Floating self-view PiP while screensharing -->
 			{#if lkState.isScreenSharing && floatingThumbnail && !hideSelf && localParticipant}
-				<div class="absolute right-6 bottom-6 z-10 h-36 w-56 overflow-hidden rounded-xl shadow-2xl ring-2 ring-white/20">
+				<div
+					class="absolute right-6 bottom-6 z-10 h-36 w-56 overflow-hidden rounded-xl shadow-2xl ring-2 ring-white/20"
+				>
 					<ParticipantTile participant={localParticipant} {lkState} isActiveSpeaker={false} />
 				</div>
 			{/if}
 		</div>
 
-		<!-- Sidebar panel -->
-		{#if activeSidebar === 'chat'}
+		{#if activeSidebar}
 			<div
-				class="border-meet-border bg-meet-panel flex w-80 shrink-0 flex-col border-l"
+				class="bg-popover m-4 w-96 rounded-xl"
 				transition:fly={{ x: 320, duration: 220, opacity: 1 }}
 			>
-				<Chat {lkState} onClose={() => (activeSidebar = null)} />
-			</div>
-		{:else if activeSidebar === 'settings'}
-			<div
-				class="border-meet-border bg-meet-panel flex w-80 shrink-0 flex-col border-l"
-				transition:fly={{ x: 320, duration: 220, opacity: 1 }}
-			>
-				<Settings
-					onClose={() => (activeSidebar = null)}
-					e2eeEnabled={lkState.e2eeEnabled}
-					{lkState}
-					{hideSelf}
-					{floatingThumbnail}
-					onHideSelfChange={(v) => (hideSelf = v)}
-					onFloatingThumbnailChange={(v) => (floatingThumbnail = v)}
-				/>
-			</div>
-		{:else if activeSidebar === 'info' || activeSidebar === 'participants'}
-			<div
-				class="border-meet-border bg-meet-panel flex w-80 shrink-0 flex-col border-l"
-				transition:fly={{ x: 320, duration: 220, opacity: 1 }}
-			>
-				<Info {lkState} onClose={() => (activeSidebar = null)} />
+				<!-- Sidebar panel -->
+				{#if activeSidebar === 'chat'}
+					<Chat {lkState} onClose={() => (activeSidebar = null)} />
+				{:else if activeSidebar === 'settings'}
+					<Settings
+						onClose={() => (activeSidebar = null)}
+						e2eeEnabled={lkState.e2eeEnabled}
+						{lkState}
+						{hideSelf}
+						{floatingThumbnail}
+						onHideSelfChange={(v) => (hideSelf = v)}
+						onFloatingThumbnailChange={(v) => (floatingThumbnail = v)}
+					/>
+				{:else if activeSidebar === 'info' || activeSidebar === 'participants'}
+					<Info {lkState} onClose={() => (activeSidebar = null)} />
+				{/if}
 			</div>
 		{/if}
 	</div>

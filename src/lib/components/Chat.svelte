@@ -19,10 +19,16 @@
 	}
 </script>
 
-<div class="flex flex-col h-full bg-popover text-foreground">
-	<div class="h-16 flex items-center justify-between px-5 shrink-0">
-		<h3 class="font-semibold text-lg">In-call messages</h3>
-		<Button variant="ghost" size="icon" onclick={onClose} class="rounded-full" aria-label="Close chat">
+<div class="text-foreground flex h-full flex-col">
+	<div class="flex h-16 shrink-0 items-center justify-between px-5">
+		<h3 class="text-lg font-semibold">In-call messages</h3>
+		<Button
+			variant="ghost"
+			size="icon"
+			onclick={onClose}
+			class="rounded-full"
+			aria-label="Close chat"
+		>
 			<Icon icon={Cancel01Icon} size={18} />
 		</Button>
 	</div>
@@ -30,7 +36,7 @@
 
 	<ScrollArea class="flex-1 px-4 py-4">
 		{#if lkState.messages.length === 0}
-			<p class="text-center text-muted-foreground text-sm py-8 px-4 leading-relaxed">
+			<p class="text-muted-foreground px-4 py-8 text-center text-sm leading-relaxed">
 				Messages can only be seen by people in the call and are deleted when the call ends.
 			</p>
 		{/if}
@@ -38,15 +44,20 @@
 		<div class="space-y-4">
 			{#each lkState.messages as msg (msg.id)}
 				<div class="flex flex-col {msg.isLocal ? 'items-end' : 'items-start'}">
-					<div class="flex items-baseline gap-2 mb-1">
-						<span class="text-sm font-medium {msg.isLocal ? 'text-primary' : 'text-muted-foreground'}">
+					<div class="mb-1 flex items-baseline gap-2">
+						<span
+							class="text-sm font-medium {msg.isLocal ? 'text-primary' : 'text-muted-foreground'}"
+						>
 							{msg.sender}
 						</span>
-						<span class="text-xs text-muted-foreground">
-							{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+						<span class="text-muted-foreground text-xs">
+							{new Date(msg.timestamp).toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							})}
 						</span>
 					</div>
-					<div class="bg-secondary rounded-2xl px-4 py-2 text-sm max-w-[90%] break-words">
+					<div class="bg-secondary max-w-[90%] rounded-2xl px-4 py-2 text-sm break-words">
 						{msg.text}
 					</div>
 				</div>
@@ -55,21 +66,21 @@
 	</ScrollArea>
 
 	<Separator />
-	<div class="p-4 shrink-0">
+	<div class="shrink-0 p-4">
 		<div class="relative">
 			<Input
 				type="text"
 				bind:value={messageText}
 				onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleSend()}
 				placeholder="Send a message..."
-				class="rounded-full pl-5 pr-12 bg-secondary border-transparent focus-visible:border-ring"
+				class="bg-secondary focus-visible:border-ring rounded-full border-transparent pr-12 pl-5"
 			/>
 			<Button
 				variant="ghost"
 				size="icon"
 				onclick={handleSend}
 				disabled={!messageText.trim()}
-				class="absolute right-1 top-1/2 -translate-y-1/2 rounded-full size-8 text-primary hover:text-primary/80"
+				class="text-primary hover:text-primary/80 absolute top-1/2 right-1 size-8 -translate-y-1/2 rounded-full"
 				aria-label="Send message"
 			>
 				<Icon icon={SentIcon} size={16} />

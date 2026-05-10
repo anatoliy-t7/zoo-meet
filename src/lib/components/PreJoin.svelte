@@ -21,11 +21,9 @@
 		LockPasswordIcon,
 	} from '@hugeicons/core-free-icons';
 	import { PersistedState } from 'runed';
-	import { cn } from '$lib/utils';
 
-	let { onJoin, e2eeAvailable = false } = $props<{
+	let { onJoin } = $props<{
 		onJoin: (name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) => void;
-		e2eeAvailable?: boolean;
 	}>();
 
 	const persistedRememberName = new PersistedState('prejoin-remember-name', true);
@@ -60,6 +58,36 @@
 	});
 
 	onMount(async () => {
+		// Query existing permission state without triggering a browser prompt
+		let videoGranted = false;
+		let audioGranted = false;
+		try {
+			const [camPerm, micPerm] = await Promise.all([
+				navigator.permissions.query({ name: 'camera' as PermissionName }),
+				navigator.permissions.query({ name: 'microphone' as PermissionName }),
+			]);
+			videoGranted = camPerm.state === 'granted';
+			audioGranted = micPerm.state === 'granted';
+		} catch {
+			// Permissions API not supported (e.g. Firefox) — leave both false
+		}
+
+		// Auto-start whichever tracks are already permitted, in parallel
+		const [videoResult, audioResult] = await Promise.allSettled([
+			videoGranted ? createLocalVideoTrack() : Promise.reject(),
+			audioGranted ? createLocalAudioTrack() : Promise.reject(),
+		]);
+
+		if (videoResult.status === 'fulfilled') {
+			videoTrack = videoResult.value;
+			isVideoEnabled = true;
+		}
+		if (audioResult.status === 'fulfilled') {
+			audioTrack = audioResult.value;
+			isAudioEnabled = true;
+		}
+
+		// Enumerate devices — full labels are now available if any permission was held
 		try {
 			videoDevices = await Room.getLocalDevices('videoinput');
 			if (videoDevices.length > 0) selectedVideoDevice = videoDevices[0].deviceId;
@@ -114,7 +142,14 @@
 	}
 
 	function handleJoin() {
-		if (name.trim()) onJoin(name, videoTrack || undefined, audioTrack || undefined);
+		if (!name.trim()) return;
+		// Transfer ownership — null out refs so onDestroy doesn't stop the tracks
+		// before the room page has a chance to publish them.
+		const video = videoTrack ?? undefined;
+		const audio = audioTrack ?? undefined;
+		videoTrack = null;
+		audioTrack = null;
+		onJoin(name, video, audio);
 	}
 </script>
 
@@ -152,10 +187,7 @@
 						variant="outline"
 						size="icon"
 						onclick={toggleAudio}
-						class={cn(
-							'border-border size-14 rounded-full',
-							isAudioEnabled ? 'bg-secondary' : 'bg-popover'
-						)}
+						class="border-border bg-secondary/90 size-14 rounded-full"
 						aria-label={isAudioEnabled ? 'Mute microphone' : 'Unmute microphone'}
 					>
 						<Icon icon={Mic01Icon} altIcon={MicOff01Icon} showAlt={!isAudioEnabled} />
@@ -164,10 +196,7 @@
 						variant="outline"
 						size="icon"
 						onclick={toggleVideo}
-						class={cn(
-							'border-border size-14 rounded-full',
-							isVideoEnabled ? 'bg-secondary' : 'bg-popover'
-						)}
+						class="border-border bg-secondary/90 size-14 rounded-full"
 						aria-label={isVideoEnabled ? 'Turn off camera' : 'Turn on camera'}
 					>
 						<Icon icon={Video01Icon} altIcon={VideoOffIcon} showAlt={!isVideoEnabled} />
@@ -178,7 +207,7 @@
 			<!-- Device selectors -->
 			<div class="flex gap-4">
 				<div class="flex flex-1 flex-col gap-1">
-					<Label>Microphone</Label>
+					<Label class="text-muted-foreground pl-2.5">Microphone</Label>
 					<Select.Root
 						type="single"
 						bind:value={selectedAudioDevice}
@@ -202,7 +231,7 @@
 					</Select.Root>
 				</div>
 				<div class="flex flex-1 flex-col gap-1">
-					<Label>Camera</Label>
+					<Label class="text-muted-foreground pl-2.5">Camera</Label>
 					<Select.Root
 						type="single"
 						bind:value={selectedVideoDevice}
@@ -232,33 +261,26 @@
 		<div class="flex w-full flex-col pt-8 md:w-[400px] md:pt-0">
 			<h2 class="mb-3 text-center text-[28px] font-semibold md:text-left">Talk confidentially</h2>
 			<p class="text-muted-foreground mb-5 text-center text-[15px] leading-relaxed md:text-left">
-				{#if e2eeAvailable}
-					End-to-end encrypted — only participants in this meeting can see or hear anything.
-				{:else}
-					Meetings secured with TLS and DTLS-SRTP media encryption.
-				{/if}
+				End-to-end encrypted — only participants in this meeting can see or hear anything.
 			</p>
-			{#if e2eeAvailable}
-				<div class=" text-brand mb-6 flex items-center gap-2 text-sm font-medium">
-					<Icon icon={LockPasswordIcon} size={16} />
-					End-to-end encrypted
-				</div>
-			{/if}
+			<div class="text-brand mb-6 flex items-center gap-2 text-sm font-medium">
+				<Icon icon={LockPasswordIcon} size={16} />
+				End-to-end encrypted
+			</div>
 
 			<div class="space-y-5">
 				<div class="flex flex-col gap-1.5">
-					<Label for="name-input">Your name</Label>
+					<Label for="name-input" class="text-muted-foreground pl-2.5">Your name</Label>
 					<Input
 						id="name-input"
 						type="text"
 						bind:value={name}
 						onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleJoin()}
 						placeholder="Enter your name"
-						class="bg-card border-border h-11 rounded-xl"
 					/>
 				</div>
 
-				<div class="flex items-center">
+				<div class="flex items-center gap-2">
 					<Checkbox
 						id="remember-name"
 						checked={persistedRememberName.current}
@@ -267,10 +289,7 @@
 							if (!v) persistedName.current = '';
 						}}
 					/>
-					<Label
-						for="remember-name"
-						class="text-muted-foreground hover:text-foreground cursor-pointer text-[15px] font-normal transition-colors"
-					>
+					<Label for="remember-name" class="text-muted-foreground">
 						Remember my name on this device
 					</Label>
 				</div>

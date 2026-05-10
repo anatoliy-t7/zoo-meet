@@ -3,7 +3,6 @@
 	import type { LiveKitState } from '$lib/livekit/store.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { Switch } from '$lib/components/ui/switch';
 	import {
 		Mic01Icon,
 		MicOff01Icon,
@@ -68,7 +67,9 @@
 		const startTime = Date.now();
 		interval = setInterval(() => {
 			const diff = Math.floor((Date.now() - startTime) / 1000);
-			const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+			const mins = Math.floor(diff / 60)
+				.toString()
+				.padStart(2, '0');
 			const secs = (diff % 60).toString().padStart(2, '0');
 			meetingDuration = `${mins}:${secs}`;
 		}, 1000);
@@ -103,12 +104,10 @@
 		await lkState.switchCamera(deviceId);
 	}
 
-	let backgroundBlur = $derived(lkState.isBlurEnabled);
-
 	const REACTIONS = ['👍', '👎', '👏', '👋', '❤️', '🎉'];
 </script>
 
-<div class="bg-meet-panel pointer-events-auto z-10 flex h-24 shrink-0 items-center px-6">
+<div class="pointer-events-auto z-10 flex h-20 shrink-0 items-center px-6">
 	<!-- Left: timer -->
 	<div class="flex flex-1 items-center gap-3">
 		<span class="text-meet-text-muted text-sm font-medium tabular-nums">{meetingDuration}</span>
@@ -116,14 +115,15 @@
 
 	<!-- Center: controls -->
 	<div class="relative flex items-center justify-center gap-2">
-
 		<!-- ── Microphone pill ── -->
 		<div class="relative" data-picker>
 			{#if openPicker === 'mic'}
 				<div
 					class="bg-meet-panel border-meet-border absolute bottom-[calc(100%+8px)] left-0 z-20 min-w-56 overflow-hidden rounded-xl border shadow-xl"
 				>
-					<p class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest">
+					<p
+						class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest uppercase"
+					>
 						Select a microphone
 					</p>
 					{#each audioDevices as d (d.deviceId)}
@@ -152,14 +152,14 @@
 			>
 				<Button
 					onclick={() => lkState.toggleMicrophone()}
-					class="text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-l-full border-none bg-transparent pl-4 pr-3 shadow-none"
+					class="text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-l-full border-none bg-transparent pr-3 pl-4 shadow-none"
 					aria-label={isMicOn ? 'Mute microphone' : 'Unmute microphone'}
 				>
-					<Icon icon={Mic01Icon} altIcon={MicOff01Icon} showAlt={!isMicOn} size={18} />
+					<Icon icon={Mic01Icon} altIcon={MicOff01Icon} showAlt={!isMicOn} />
 				</Button>
 				<Button
 					onclick={() => togglePicker('mic')}
-					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-r-full border-l border-y-0 border-r-0 bg-transparent pl-1 pr-3 shadow-none"
+					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-r-full border-y-0 border-r-0 border-l bg-transparent pr-3 pl-1 shadow-none"
 					aria-label="Select microphone"
 					aria-expanded={openPicker === 'mic'}
 				>
@@ -178,7 +178,9 @@
 				<div
 					class="bg-meet-panel border-meet-border absolute bottom-[calc(100%+8px)] left-0 z-20 min-w-56 overflow-hidden rounded-xl border shadow-xl"
 				>
-					<p class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest">
+					<p
+						class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest uppercase"
+					>
 						Select a camera
 					</p>
 					{#each videoDevices as d (d.deviceId)}
@@ -197,20 +199,6 @@
 					{#if videoDevices.length === 0}
 						<p class="text-meet-text-muted px-3 py-2 text-sm">No devices found</p>
 					{/if}
-					<!-- Video effects section -->
-					<div class="border-meet-border mt-1 border-t pt-1 pb-2">
-						<p class="text-meet-text-muted px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest">
-							Video effects
-						</p>
-						<div class="flex items-center justify-between px-3 py-2">
-							<span class="text-sm">Background blur</span>
-						<Switch
-							checked={backgroundBlur}
-							onCheckedChange={(v) => lkState.toggleBackgroundBlur(v)}
-							aria-label="Toggle background blur"
-						/>
-						</div>
-					</div>
 				</div>
 			{/if}
 
@@ -221,14 +209,14 @@
 			>
 				<Button
 					onclick={() => lkState.toggleCamera()}
-					class="text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-l-full border-none bg-transparent pl-4 pr-3 shadow-none"
+					class="text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-l-full border-none bg-transparent pr-3 pl-4 shadow-none"
 					aria-label={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
 				>
-					<Icon icon={Video01Icon} altIcon={VideoOffIcon} showAlt={!isVideoOn} size={18} />
+					<Icon icon={Video01Icon} altIcon={VideoOffIcon} showAlt={!isVideoOn} />
 				</Button>
 				<Button
 					onclick={() => togglePicker('cam')}
-					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-r-full border-l border-y-0 border-r-0 bg-transparent pl-1 pr-3 shadow-none"
+					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-12 rounded-none rounded-r-full border-y-0 border-r-0 border-l bg-transparent pr-3 pl-1 shadow-none"
 					aria-label="Select camera"
 					aria-expanded={openPicker === 'cam'}
 				>
@@ -249,7 +237,7 @@
 				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
 			aria-label="Share screen"
 		>
-			<Icon icon={ComputerScreenShareIcon} size={18} />
+			<Icon icon={ComputerScreenShareIcon} />
 		</Button>
 
 		<!-- ── Participants ── -->
@@ -261,7 +249,7 @@
 				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
 			aria-label="Participants"
 		>
-			<Icon icon={UserGroupIcon} size={18} />
+			<Icon icon={UserGroupIcon} />
 			<span
 				class="bg-meet-card text-meet-text border-meet-panel absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border-2 text-[9px] font-bold"
 			>
@@ -278,7 +266,7 @@
 				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
 			aria-label="Chat"
 		>
-			<Icon icon={Message01Icon} size={18} />
+			<Icon icon={Message01Icon} />
 		</Button>
 
 		<!-- ── Reactions ── -->
@@ -291,7 +279,7 @@
 				aria-label="Reactions"
 				aria-expanded={isReactionsOpen}
 			>
-				<Icon icon={SmileIcon} size={18} />
+				<Icon icon={SmileIcon} />
 			</Button>
 
 			{#if isReactionsOpen}
@@ -329,7 +317,7 @@
 				: 'bg-meet-btn hover:bg-meet-btn-hover text-meet-text'}"
 			aria-label="Settings"
 		>
-			<Icon icon={Settings01Icon} size={18} />
+			<Icon icon={Settings01Icon} />
 		</Button>
 
 		<!-- ── Leave ── -->

@@ -2,39 +2,35 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { createLiveKitState } from '$lib/livekit/store.svelte';
+	import { deriveE2EEKey } from '$lib/utils/e2ee';
 	import { Track, type LocalVideoTrack, type LocalAudioTrack } from 'livekit-client';
 	import PreJoin from '$lib/components/PreJoin.svelte';
 	import Room from '$lib/components/Room.svelte';
 	import { onDestroy } from 'svelte';
 	import { PUBLIC_LIVEKIT_URL } from '$env/static/public';
 
-	const roomId = $page.params.room;
+	const roomId = $page.params.room ?? '';
 
 	let lkState = createLiveKitState();
 	let joined = $state(false);
 	let error = $state<string | null>(null);
 
-	/** Extract E2EE passphrase from the URL fragment (#key=…). Never sent to any server. */
-	function getE2EEKey(): string | undefined {
-		if (typeof window === 'undefined') return undefined;
-		const hash = window.location.hash;
-		if (!hash.startsWith('#key=')) return undefined;
-		return decodeURIComponent(hash.slice(5)) || undefined;
-	}
-
 	async function handleJoin(name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) {
 		try {
-			const res = await fetch('/api/livekit/token', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ room: roomId, participantName: name }),
-			});
+			const [res, e2eeKey] = await Promise.all([
+				fetch('/api/livekit/token', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ room: roomId, participantName: name }),
+				}),
+				deriveE2EEKey(roomId),
+			]);
 
 			if (!res.ok) throw new Error('Failed to get token');
 
 			const { token } = await res.json();
 
-			await lkState.connect(PUBLIC_LIVEKIT_URL, token, getE2EEKey());
+			await lkState.connect(PUBLIC_LIVEKIT_URL, token, e2eeKey);
 
 			if (videoTrack && lkState.room) {
 				await lkState.room.localParticipant.publishTrack(videoTrack, {
@@ -83,7 +79,7 @@
 			</div>
 		</div>
 	{/if}
-	<PreJoin onJoin={handleJoin} e2eeAvailable={!!getE2EEKey()} />
+	<PreJoin onJoin={handleJoin} />
 {:else}
 	<Room {lkState} onLeave={handleLeave} />
 {/if}

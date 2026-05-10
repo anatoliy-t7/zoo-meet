@@ -52,10 +52,16 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-popover text-foreground">
+<div class="text-foreground flex h-full flex-col">
 	<div class="flex h-16 shrink-0 items-center justify-between px-5">
 		<h3 class="text-lg font-semibold">Settings</h3>
-		<Button variant="ghost" size="icon" onclick={onClose} class="rounded-full" aria-label="Close settings">
+		<Button
+			variant="ghost"
+			size="icon"
+			onclick={onClose}
+			class="rounded-full"
+			aria-label="Close settings"
+		>
 			<Icon icon={Cancel01Icon} size={18} />
 		</Button>
 	</div>
@@ -65,7 +71,7 @@
 		<div class="space-y-6">
 			<!-- Security -->
 			<div>
-				<p class="text-muted-foreground mb-3 text-xs uppercase tracking-widest">Security</p>
+				<p class="text-muted-foreground mb-3 text-xs tracking-widest uppercase">Security</p>
 				<div class="space-y-4">
 					<!-- E2EE status -->
 					<div class="flex items-center justify-between gap-4">
@@ -82,7 +88,9 @@
 								Active
 							</span>
 						{:else}
-							<span class="text-muted-foreground bg-muted rounded-full px-2.5 py-0.5 text-xs font-medium">
+							<span
+								class="text-muted-foreground bg-muted rounded-full px-2.5 py-0.5 text-xs font-medium"
+							>
 								Off
 							</span>
 						{/if}
@@ -92,7 +100,9 @@
 					<div class="flex items-center justify-between">
 						<div>
 							<Label for="lock-meeting" class="cursor-pointer font-normal">Lock meeting</Label>
-							<p class="text-muted-foreground mt-0.5 text-xs">Prevent new participants from joining</p>
+							<p class="text-muted-foreground mt-0.5 text-xs">
+								Prevent new participants from joining
+							</p>
 						</div>
 						<Switch
 							id="lock-meeting"
@@ -108,7 +118,7 @@
 
 			<!-- Video -->
 			<div>
-				<p class="text-muted-foreground mb-3 text-xs uppercase tracking-widest">Video</p>
+				<p class="text-muted-foreground mb-3 text-xs tracking-widest uppercase">Video</p>
 				<div class="space-y-4">
 					<div class="flex items-center justify-between">
 						<Label for="bg-blur" class="cursor-pointer font-normal">Background blur</Label>
@@ -120,7 +130,9 @@
 						/>
 					</div>
 					<div class="flex items-center justify-between">
-						<Label for="incoming-video" class="cursor-pointer font-normal">Turn off incoming video</Label>
+						<Label for="incoming-video" class="cursor-pointer font-normal"
+							>Turn off incoming video</Label
+						>
 						<Switch
 							id="incoming-video"
 							checked={turnOffIncoming}
@@ -138,7 +150,7 @@
 						/>
 					</div>
 					<div class="flex items-center justify-between gap-4">
-						<Label for="floating-thumb" class="cursor-pointer font-normal leading-snug">
+						<Label for="floating-thumb" class="cursor-pointer leading-snug font-normal">
 							Floating thumbnail during screenshare
 						</Label>
 						<Switch
@@ -155,7 +167,7 @@
 
 			<!-- Audio -->
 			<div>
-				<p class="text-muted-foreground mb-3 text-xs uppercase tracking-widest">Audio</p>
+				<p class="text-muted-foreground mb-3 text-xs tracking-widest uppercase">Audio</p>
 				<div class="flex items-center justify-between">
 					<Label for="noise-cancel" class="cursor-pointer font-normal">Noise cancellation</Label>
 					<Switch

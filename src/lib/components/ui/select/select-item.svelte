@@ -3,13 +3,18 @@
 	import { cn } from '$lib/utils';
 	import type { SelectItemProps } from 'bits-ui';
 
-	let { ref = $bindable(null), class: className, label, ...restProps }: Omit<SelectItemProps, 'children'> = $props();
+	let {
+		ref = $bindable(null),
+		class: className,
+		label,
+		...restProps
+	}: Omit<SelectItemProps, 'children'> = $props();
 </script>
 
 <Select.Item
 	bind:ref
 	class={cn(
-		'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex w-full cursor-default select-none items-center gap-2 rounded-lg py-2 pr-4 pl-8 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+		'data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex w-full cursor-default items-center gap-2 rounded-full py-2 pr-4 pl-8 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
 		className
 	)}
 	{label}
