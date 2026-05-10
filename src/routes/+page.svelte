@@ -74,7 +74,7 @@
 	<meta name="twitter:image" content="/hero.webp" />
 </svelte:head>
 
-<div class="bg-background text-foreground min-h-screen font-sans">
+<div class="bg-background text-foreground relative min-h-screen font-sans">
 	<div class="border-border border-b">
 		<nav class=" mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
 			<div class="flex items-center gap-2.5">
@@ -85,7 +85,7 @@
 			</div>
 
 			<a
-				href="https://github.com/anatoliy-t7/Video Talk"
+				href="https://github.com/anatoliy-t7/zoo-meet"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="border-border text-muted-foreground hover:text-foreground hover:bg-accent flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition-colors"
@@ -187,7 +187,7 @@
 
 			<div class="text-muted-foreground flex items-center gap-6 text-sm">
 				<a
-					href="https://github.com/anatoliy-t7/Video Talk"
+					href="https://github.com/anatoliy-t7/zoo-meet"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="hover:text-foreground flex items-center gap-1.5 transition-colors"
