@@ -1,0 +1,33 @@
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yaml
+    restart: unless-stopped
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "50000-50050:50000-50050/udp"
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml
+    depends_on:
+      - valkey
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  huddle:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=secret
+      # The app running in Docker connects to livekit service on backend, but client in browser connects to localhost
+      # Setting this to localhost/127.0.0.1 for the browser client to use.
+      - PUBLIC_LIVEKIT_URL=ws://127.0.0.1:7880
+    depends_on:
+      - livekit

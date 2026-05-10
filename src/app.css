@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Huddle Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Meet surface palette */
+  --meet-bg:         oklch(17% 0 0);
+  --meet-panel:      oklch(22% 0 0);
+  --meet-card:       oklch(27% 0 0);
+  --meet-border:     oklch(30% 0 0);
+  --meet-btn:        oklch(30% 0 0);
+  --meet-btn-hover:  oklch(35% 0 0);
+  --meet-btn-active: oklch(40% 0 0);
+  --meet-text:       oklch(98% 0 0);
+  --meet-text-muted: oklch(70% 0 0);
+  --meet-red:        oklch(62.7% 0.25 25.7);
+  --meet-red-hover:  oklch(66% 0.22 25.7);
+
+  /* Brand — yellow */
+  --brand:           oklch(0.795 0.184 86);  /* yellow-500 */
+  --brand-dark:      oklch(0.720 0.180 86);  /* yellow-600 */
+
+  /* ─── shadcn semantic tokens (mapped to meet palette) ────────────── */
+  --background:           var(--meet-bg);
+  --foreground:           var(--meet-text);
+  --card:                 var(--meet-card);
+  --card-foreground:      var(--meet-text);
+  --popover:              var(--meet-panel);
+  --popover-foreground:   var(--meet-text);
+  --primary:              var(--brand);
+  --primary-foreground:   oklch(0 0 0);
+  --secondary:            var(--meet-btn);
+  --secondary-foreground: var(--meet-text);
+  --muted:                var(--meet-btn);
+  --muted-foreground:     var(--meet-text-muted);
+  --accent:               var(--meet-btn-hover);
+  --accent-foreground:    var(--meet-text);
+  --destructive:          var(--meet-red);
+  --destructive-foreground: var(--meet-text);
+  --border:               var(--meet-border);
+  --input:                var(--meet-btn);
+  --ring:                 var(--brand);
+  --radius:               0.625rem;
+}
+
+/* ─── @theme — expose all tokens as Tailwind utility classes ────────── */
+@theme inline {
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+
+  --color-meet-bg:          var(--meet-bg);
+  --color-meet-panel:       var(--meet-panel);
+  --color-meet-card:        var(--meet-card);
+  --color-meet-border:      var(--meet-border);
+  --color-meet-btn:         var(--meet-btn);
+  --color-meet-btn-hover:   var(--meet-btn-hover);
+  --color-meet-btn-active:  var(--meet-btn-active);
+  --color-meet-text:        var(--meet-text);
+  --color-meet-text-muted:  var(--meet-text-muted);
+  --color-meet-red:         var(--meet-red);
+  --color-meet-red-hover:   var(--meet-red-hover);
+  --color-brand-500:        var(--brand);
+  --color-brand-600:        var(--brand-dark);
+
+
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-card:                 var(--card);
+  --color-card-foreground:      var(--card-foreground);
+  --color-popover:              var(--popover);
+  --color-popover-foreground:   var(--popover-foreground);
+  --color-primary:              var(--primary);
+  --color-primary-foreground:   var(--primary-foreground);
+  --color-secondary:            var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:                var(--muted);
+  --color-muted-foreground:     var(--muted-foreground);
+  --color-accent:               var(--accent);
+  --color-accent-foreground:    var(--accent-foreground);
+  --color-destructive:          var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border:               var(--border);
+  --color-input:                var(--input);
+  --color-ring:                 var(--ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
