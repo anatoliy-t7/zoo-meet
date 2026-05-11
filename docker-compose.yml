@@ -1,22 +1,37 @@
 services:
   livekit:
     image: livekit/livekit-server:latest
-    command: --config /etc/livekit.yaml
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        apk add --no-cache gettext >/dev/null
+        envsubst '$$LIVEKIT_API_KEY $$LIVEKIT_API_SECRET' < /etc/livekit.template.yaml > /etc/livekit.yaml
+        exec /livekit-server --config /etc/livekit.yaml
     restart: unless-stopped
+    environment:
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
     ports:
       - "7880:7880"
       - "7881:7881"
-      - "50000-50050:50000-50050/udp"
+      - "50000-60000:50000-60000/udp"
     volumes:
-      - ./livekit.yaml:/etc/livekit.yaml
+      - ./livekit.yaml.template:/etc/livekit.template.yaml:ro
     depends_on:
       - valkey
+    networks:
+      - default
+      - dokploy-network
 
   valkey:
     image: valkey/valkey:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
+    networks:
+      - default
+      - dokploy-network
 
   zoomeet:
     build: .
@@ -26,8 +41,14 @@ services:
     environment:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
-      # The app running in Docker connects to livekit service on backend, but client in browser connects to localhost
-      # Setting this to localhost/127.0.0.1 for the browser client to use.
+      # Browser WebRTC uses this URL; use wss:// and your public LiveKit hostname in production.
       - PUBLIC_LIVEKIT_URL=${PUBLIC_LIVEKIT_URL}
     depends_on:
       - livekit
+    networks:
+      - default
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    external: true

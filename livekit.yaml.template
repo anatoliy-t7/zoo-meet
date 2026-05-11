@@ -13,4 +13,4 @@ redis:
   password: ""
   db: 0
 keys:
-  devkey: QZIxms1AaM3L7YzzYSnfRBpG
+  "${LIVEKIT_API_KEY}": "${LIVEKIT_API_SECRET}"
