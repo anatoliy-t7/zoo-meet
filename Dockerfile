@@ -11,6 +11,11 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prefer-offline
 
 COPY . .
+
+# Must be present at build time for $env/static/public (SvelteKit).
+ARG PUBLIC_BRAND_NAME=ZooMeet
+ENV PUBLIC_BRAND_NAME=${PUBLIC_BRAND_NAME}
+
 RUN pnpm run build
 
 FROM node:25-alpine
