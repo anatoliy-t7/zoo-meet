@@ -3,14 +3,13 @@ include:
 
 services:
   zoomeet:
-    build: .
+    image: ${ZOOMEET_IMAGE:?set ZOOMEET_IMAGE e.g. yourdockerhubuser/zoomeet:latest}
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
-      # Browser WebRTC uses this URL; use wss:// and your public LiveKit hostname in production.
       - PUBLIC_LIVEKIT_URL=${PUBLIC_LIVEKIT_URL}
     depends_on:
       - livekit

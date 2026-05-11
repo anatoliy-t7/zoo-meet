@@ -1,0 +1,39 @@
+# Shared LiveKit + Valkey stack. Included by docker-compose.yml (local build) and docker-compose.hub.yml (pre-built app image).
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        apk add --no-cache gettext >/dev/null
+        envsubst '$$LIVEKIT_API_KEY $$LIVEKIT_API_SECRET' < /etc/livekit.template.yaml > /etc/livekit.yaml
+        exec /livekit-server --config /etc/livekit.yaml
+    restart: unless-stopped
+    environment:
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "50000-60000:50000-60000/udp"
+    volumes:
+      - ./livekit.yaml.template:/etc/livekit.template.yaml:ro
+    depends_on:
+      - valkey
+    networks:
+      - default
+      - dokploy-network
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - default
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    external: true
