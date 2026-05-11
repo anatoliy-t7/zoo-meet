@@ -7,7 +7,10 @@
 	import PreJoin from '$lib/components/PreJoin.svelte';
 	import Room from '$lib/components/Room.svelte';
 	import { onDestroy } from 'svelte';
-	import { PUBLIC_LIVEKIT_URL, PUBLIC_BRAND_NAME } from '$env/static/public';
+
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	const roomId = $page.params.room ?? '';
 
@@ -17,6 +20,10 @@
 
 	async function handleJoin(name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) {
 		try {
+			if (!data.publicLivekitUrl) {
+				throw new Error('LiveKit URL is not configured');
+			}
+
 			const [res, e2eeKey] = await Promise.all([
 				fetch('/api/livekit/token', {
 					method: 'POST',
@@ -30,7 +37,7 @@
 
 			const { token } = await res.json();
 
-			await lkState.connect(PUBLIC_LIVEKIT_URL, token, e2eeKey);
+			await lkState.connect(data.publicLivekitUrl, token, e2eeKey);
 
 			if (videoTrack && lkState.room) {
 				await lkState.room.localParticipant.publishTrack(videoTrack, {
@@ -61,11 +68,11 @@
 </script>
 
 <svelte:head>
-	<title>{PUBLIC_BRAND_NAME} — Join meeting {roomId}</title>
-	<meta name="description" content="You've been invited to a {PUBLIC_BRAND_NAME} video call. Join now — no account or download required." />
+	<title>{data.publicBrandName} — Join meeting {roomId}</title>
+	<meta name="description" content="You've been invited to a {data.publicBrandName} video call. Join now — no account or download required." />
 	<meta name="robots" content="noindex, nofollow" />
-	<meta property="og:title" content="Join a {PUBLIC_BRAND_NAME} meeting" />
-	<meta property="og:description" content="You've been invited to a secure, end-to-end encrypted video call on {PUBLIC_BRAND_NAME}. Join in one click." />
+	<meta property="og:title" content="Join a {data.publicBrandName} meeting" />
+	<meta property="og:description" content="You've been invited to a secure, end-to-end encrypted video call on {data.publicBrandName}. Join in one click." />
 	<meta property="og:image" content="/hero.webp" />
 </svelte:head>
 

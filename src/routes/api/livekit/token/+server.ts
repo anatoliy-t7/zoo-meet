@@ -1,5 +1,5 @@
+import { env } from '$env/dynamic/private';
 import { AccessToken } from 'livekit-server-sdk';
-import { LIVEKIT_API_KEY, LIVEKIT_API_SECRET } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -10,6 +10,8 @@ const VALID_ROOM_RE = /^[a-z0-9][a-z0-9-]{1,98}[a-z0-9]$/;
 /** Issues a short-lived LiveKit JWT for the given room + participant. */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
+		const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY;
+		const LIVEKIT_API_SECRET = env.LIVEKIT_API_SECRET;
 		if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
 			return json({ error: 'Server misconfigured' }, { status: 500 });
 		}

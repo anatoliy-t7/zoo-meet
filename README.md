@@ -35,8 +35,8 @@ The easiest way to run the full stack locally is with Docker Compose, which star
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/suitenumerique/meet.git
-   cd ZooMeet
+   git clone https://github.com/anatoliy-t7/zoo-meet.git
+   cd zoo-meet
    ```
 
 2. Start everything:
@@ -77,7 +77,7 @@ If you want hot module replacement during development, run LiveKit in Docker and
 The project ships with a `.env` file pre-configured for local development:
 
 ```env
-# LiveKit server credentials — must match your LiveKit config
+# LiveKit server credentials — must match the `keys:` map in livekit.yaml (key id and secret)
 LIVEKIT_API_KEY=devkey
 LIVEKIT_API_SECRET=secret
 

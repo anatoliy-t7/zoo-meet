@@ -24,10 +24,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - LIVEKIT_API_KEY=devkey
-      - LIVEKIT_API_SECRET=secret
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
       # The app running in Docker connects to livekit service on backend, but client in browser connects to localhost
       # Setting this to localhost/127.0.0.1 for the browser client to use.
-      - PUBLIC_LIVEKIT_URL=ws://127.0.0.1:7880
+      - PUBLIC_LIVEKIT_URL=${PUBLIC_LIVEKIT_URL}
     depends_on:
       - livekit

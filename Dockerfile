@@ -2,8 +2,13 @@ FROM node:25-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm i --frozen-lockfile
+RUN apk add --no-cache alpine-sdk python3
+RUN npm install -g pnpm@latest
+
+ENV CI=true
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 COPY . .
 RUN pnpm run build
