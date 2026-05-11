@@ -3,7 +3,7 @@ include:
 
 services:
   zoomeet:
-    image: ${ZOOMEET_IMAGE:?set ZOOMEET_IMAGE e.g. yourdockerhubuser/zoomeet:latest}
+    image: anatoliydev7/zoomeet:latest
     restart: unless-stopped
     ports:
       - "3000:3000"

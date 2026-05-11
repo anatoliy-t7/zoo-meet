@@ -169,7 +169,7 @@ You can run **each image as its own Dokploy application** (Docker source) instea
    - **Domain in Dokploy:** map your signaling host (e.g. `livekit.example.com`) to container port **7880** with HTTPS so browsers use **`wss://`**.
 
 3. **ZooMeet** (Application → source **Docker**)
-   - **Image:** your published image, e.g. **`yourdockerhub/zoomeet:latest`** (see [Deploy with the image](#deploy-with-the-image-no-app-build-on-the-server)).
+   - **Image:** your published image, e.g. **`anatoliydev7/zoomeet:latest`** (see [Deploy with the image](#deploy-with-the-image-no-app-build-on-the-server)).
    - **Network:** **`dokploy-network`**.
    - **Environment:** **`LIVEKIT_API_KEY`**, **`LIVEKIT_API_SECRET`** (must match the id/secret in **`LIVEKIT_KEYS`**), **`PUBLIC_LIVEKIT_URL`** (**`wss://`** to the **same** host you exposed for LiveKit in step 2), and optional **`PUBLIC_BRAND_NAME`** if you build the image accordingly.
    - **Domain:** map the UI host (e.g. `meet.example.com`) to port **3000**.
@@ -197,7 +197,7 @@ You can run **each image as its own Dokploy application** (Docker source) instea
    - **`LIVEKIT_API_SECRET`** — matching secret (must stay in sync with the key id).
    - **`PUBLIC_LIVEKIT_URL`** — WebSocket URL **as** **the browser** will use it in production, e.g. `wss://livekit.example.com` (scheme, host, and port must match your LiveKit domain and TLS setup).
    - **`PUBLIC_BRAND_NAME`** — optional for a **locally built** app; for a **Docker Hub** image, public branding is fixed at **image build** time unless you rebuild with custom build args.
-   - **`ZOOMEET_IMAGE`** — required only for **`docker-compose.hub.yml`**, e.g. `yourdockerhubuser/zoomeet:latest`.
+   - **`ZOOMEET_IMAGE`** — required only for **`docker-compose.hub.yml`**, e.g. `anatoliydev7/zoomeet:latest`.
 
    Do **not** commit production `LIVEKIT_*` values to Git. On startup, the **LiveKit** container renders **`livekit.yaml.template`** with `envsubst` into `/etc/livekit.yaml` inside the container, so **`keys:`** always matches **`LIVEKIT_API_KEY`** / **`LIVEKIT_API_SECRET`**.
 
