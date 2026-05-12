@@ -1,8 +1,15 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { PUBLIC_BRAND_NAME } from '$env/static/public';
 	import '../app.css';
 
 	let { children } = $props();
+
+	$effect(() => {
+		if (document.documentElement.lang !== page.data.locale) {
+			document.documentElement.lang = page.data.locale;
+		}
+	});
 </script>
 
 <svelte:head>

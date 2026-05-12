@@ -1,3 +1,4 @@
+import { getLocale } from '$lib/i18n';
 import type { Handle } from '@sveltejs/kit';
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -19,6 +20,8 @@ const SECURITY_HEADERS: Record<string, string> = {
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
+	event.locals.locale = getLocale(event);
+
 	const response = await resolve(event);
 
 	for (const [header, value] of Object.entries(SECURITY_HEADERS)) {
