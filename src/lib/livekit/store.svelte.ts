@@ -9,8 +9,10 @@ import {
 	type RemoteTrackPublication,
 } from 'livekit-client';
 import { BackgroundBlur, supportsBackgroundProcessors } from '@livekit/track-processors';
-import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { z } from 'zod';
+
+import { isMeetingRoomLockedFromMetadata } from '$lib/livekit/meeting-room-metadata';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 export type ChatMessage = {
 	id: string;
@@ -70,6 +72,10 @@ export class LiveKitState {
 	unreadChatCount: number = $state(0);
 	/** Mirrors whether the Chat sidebar is visible; drives unread tally. */
 	chatSidebarOpen: boolean = $state(false);
+	/** JWT from PreJoin; authorizes `/api/livekit/room-lock` (cleared on disconnect). */
+	joinAccessToken: string | null = $state(null);
+	/** Room slug from the app URL; paired with `joinAccessToken`. */
+	roomSlug: string | null = $state(null);
 
 	/** Per-identity timers for clearing reactions. Not reactive — internal only. */
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive timer map
@@ -92,11 +98,12 @@ export class LiveKitState {
 
 	/**
 	 * Connect to a LiveKit room.
+	 * @param roomSlug Same id as used for token issuance (`/api/livekit/token` `room`).
 	 * @param e2eeKey  Optional passphrase for E2EE (derived via PBKDF2 inside the SDK).
 	 *                 Pass the value extracted from the URL fragment — it is never sent to
 	 *                 any server.
 	 */
-	async connect(url: string, token: string, e2eeKey?: string) {
+	async connect(url: string, token: string, roomSlug: string, e2eeKey?: string) {
 		if (this.room) await this.disconnect();
 
 		// Build room options, including E2EE when a key is provided
@@ -124,7 +131,13 @@ export class LiveKitState {
 		const newRoom = new Room(roomOptions);
 
 		newRoom
-			.on(RoomEvent.ParticipantConnected, () => this.updateParticipants())
+			.on(RoomEvent.ParticipantConnected, () => {
+				this.updateParticipants();
+				// Late joiners never saw earlier lock broadcasts; resend current state.
+				if (this.isLocked) {
+					void this.publishLockState(true);
+				}
+			})
 			.on(RoomEvent.ParticipantDisconnected, () => this.updateParticipants())
 			.on(RoomEvent.TrackSubscribed, () => this.triggerTrackChange())
 			.on(RoomEvent.TrackUnsubscribed, () => this.triggerTrackChange())
@@ -134,6 +147,9 @@ export class LiveKitState {
 			.on(RoomEvent.TrackUnmuted, () => this.triggerTrackChange())
 			.on(RoomEvent.ActiveSpeakersChanged, (speakers: Participant[]) => {
 				this.activeSpeakers = speakers;
+			})
+			.on(RoomEvent.RoomMetadataChanged, (meta: string) => {
+				this.isLocked = isMeetingRoomLockedFromMetadata(meta);
 			})
 			.on(RoomEvent.DataReceived, (payload: Uint8Array, participant?: Participant) => {
 				try {
@@ -190,7 +206,10 @@ export class LiveKitState {
 		}
 
 		this.room = newRoom;
+		this.joinAccessToken = token;
+		this.roomSlug = roomSlug;
 		this.e2eeEnabled = !!e2eeKey;
+		this.isLocked = isMeetingRoomLockedFromMetadata(newRoom.metadata);
 		this.updateParticipants();
 	}
 
@@ -206,6 +225,8 @@ export class LiveKitState {
 		this.e2eeEnabled = false;
 		this.isBlurEnabled = false;
 		this.isLocked = false;
+		this.joinAccessToken = null;
+		this.roomSlug = null;
 		this.activeReactions.clear();
 		this.raisedHands.clear();
 		this.unreadChatCount = 0;
@@ -328,14 +349,50 @@ export class LiveKitState {
 	}
 
 	/**
-	 * Broadcast meeting lock state to all participants via the data channel.
-	 * Note: preventing new joins requires server-side enforcement in the token API.
+	 * Toggle meeting lock for everyone (data channel) and enforce it on the issuing server
+	 * (LiveKit room metadata → token route). Reverts if the server update fails.
 	 */
-	setLocked(locked: boolean) {
+	async setLocked(locked: boolean): Promise<void> {
 		if (!this.room) return;
+
+		const prev = this.isLocked;
 		this.isLocked = locked;
+		await this.publishLockState(locked);
+
+		const bearer = this.joinAccessToken;
+		const slug = this.roomSlug;
+		if (!bearer?.trim() || !slug?.trim()) {
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/livekit/room-lock', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${bearer}`,
+				},
+				body: JSON.stringify({ room: slug, locked }),
+			});
+
+			if (!res.ok) {
+				const errText = await res.text().catch(() => '');
+				throw new Error(errText || res.statusText);
+			}
+		} catch (e: unknown) {
+			console.error(e);
+			this.isLocked = prev;
+			await this.publishLockState(prev);
+			throw new Error('Could not sync lock with server', { cause: e });
+		}
+	}
+
+	/** Sends the lock packet (used by toggle and ParticipantConnected rebroadcast). */
+	private async publishLockState(locked: boolean): Promise<void> {
+		if (!this.room) return;
 		const payload = new TextEncoder().encode(JSON.stringify({ type: 'lock', locked }));
-		this.room.localParticipant.publishData(payload, { reliable: true });
+		await this.room.localParticipant.publishData(payload, { reliable: true });
 	}
 
 	sendMessage(text: string) {

@@ -100,7 +100,7 @@
 		</nav>
 	</div>
 
-	<main class="mx-auto max-w-7xl px-6 py-32 lg:flex lg:items-center lg:gap-16">
+	<main class="mx-auto grid max-w-7xl gap-16 px-6 py-32 lg:flex lg:items-center">
 		<div class="lg:w-1/2">
 			<h1 class="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
 				Meet face-to-face,<br />from anywhere on Earth.
@@ -143,14 +143,12 @@
 			</div>
 		</div>
 
-		<div class="hidden lg:block lg:w-1/2">
+		<div class="lg:w-1/2">
 			<div class="relative overflow-hidden rounded-3xl shadow-2xl">
 				<img
 					src="/hero.webp"
 					alt="{PUBLIC_BRAND_NAME} video call interface"
 					class="w-full object-cover"
-					width="1280"
-					height="720"
 					fetchpriority="high"
 				/>
 			</div>

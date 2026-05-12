@@ -1,17 +1,20 @@
+import { env as publicEnv } from '$env/dynamic/public';
 import { env } from '$env/dynamic/private';
-import { AccessToken } from 'livekit-server-sdk';
+import { livekitClientUrlToHttpApiUrl } from '$lib/livekit/livekit-http-url';
+import { isMeetingRoomLockedFromMetadata } from '$lib/livekit/meeting-room-metadata';
+import { LIVEKIT_ROOM_MAX_LENGTH, isValidLivekitRoomId } from '$lib/server/livekit-room-id';
+import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 const MAX_NAME_LENGTH = 100;
-const MAX_ROOM_LENGTH = 100;
-const VALID_ROOM_RE = /^[a-z0-9][a-z0-9-]{1,98}[a-z0-9]$/;
 
 /** Issues a short-lived LiveKit JWT for the given room + participant. */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY;
 		const LIVEKIT_API_SECRET = env.LIVEKIT_API_SECRET;
+
 		if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
 			return json({ error: 'Server misconfigured' }, { status: 500 });
 		}
@@ -29,11 +32,29 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!cleanRoom || !cleanName) {
 			return json({ error: 'Missing room or participantName' }, { status: 400 });
 		}
-		if (cleanRoom.length > MAX_ROOM_LENGTH || cleanName.length > MAX_NAME_LENGTH) {
+		if (cleanRoom.length > LIVEKIT_ROOM_MAX_LENGTH || cleanName.length > MAX_NAME_LENGTH) {
 			return json({ error: 'room or participantName too long' }, { status: 400 });
 		}
-		if (!VALID_ROOM_RE.test(cleanRoom)) {
+		if (!isValidLivekitRoomId(cleanRoom)) {
 			return json({ error: 'Invalid room name' }, { status: 400 });
+		}
+
+		const lkHttpUrl = livekitClientUrlToHttpApiUrl(publicEnv.PUBLIC_LIVEKIT_URL ?? '');
+		if (lkHttpUrl) {
+			try {
+				const roomSvc = new RoomServiceClient(lkHttpUrl, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
+				const rooms = await roomSvc.listRooms([cleanRoom]);
+				const existing = rooms[0];
+				if (existing?.metadata !== undefined && isMeetingRoomLockedFromMetadata(existing.metadata)) {
+					const participants = await roomSvc.listParticipants(cleanRoom);
+					const alreadyInRoom = participants.some((p) => p.identity === cleanName);
+					if (!alreadyInRoom) {
+						return json({ error: 'Meeting is locked' }, { status: 403 });
+					}
+				}
+			} catch (e) {
+				console.warn('LiveKit locked-room check skipped due to RoomService error:', e);
+			}
 		}
 
 		const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {

@@ -155,7 +155,7 @@
 							{#if activeMicId === d.deviceId || (!activeMicId && d.deviceId === 'default')}
 								<Icon icon={CheckmarkCircle01Icon} size={14} color="var(--brand)" />
 							{:else}
-								<span class="size-[14px]"></span>
+								<span class="size-3.5"></span>
 							{/if}
 							<span class="truncate">{d.label || 'Microphone'}</span>
 						</button>
@@ -335,7 +335,7 @@
 					{/each}
 
 					<!-- Divider -->
-					<div class="bg-meet-border mx-1 h-6 w-px shrink-0"></div>
+					<div class="bg-meet-border mx-1 h-px w-6 shrink-0 sm:h-6 sm:w-px"></div>
 
 					<!-- Raise hand — persistent until dismissed -->
 					<button
@@ -366,7 +366,7 @@
 		<!-- ── Settings ── -->
 		<Button
 			onclick={() => toggleSidebar('settings')}
-			class="!size-10 sm:!size-12 {activeSidebar === 'settings'
+			class="size-10 sm:size-12 {activeSidebar === 'settings'
 				? 'bg-meet-btn-active text-meet-text'
 				: ''}"
 			size="icon-lg"

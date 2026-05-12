@@ -45,10 +45,10 @@
 		await lkState.setNoiseCancellationEnabled(v);
 	}
 
-	/** Lock meeting — broadcast to all participants, server enforcement is TODO */
+	/** Lock meeting — data channel + LiveKit room metadata (token API blocks new joins). */
 	let lockMeeting = $derived(lkState.isLocked);
-	function handleLockChange(v: boolean) {
-		lkState.setLocked(v);
+	async function handleLockChange(v: boolean) {
+		await lkState.setLocked(v);
 	}
 </script>
 

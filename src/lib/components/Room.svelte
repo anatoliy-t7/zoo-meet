@@ -106,7 +106,7 @@
 			<!-- Floating self-view PiP while screensharing -->
 			{#if lkState.isScreenSharing && floatingThumbnail && !hideSelf && localParticipant}
 				<div
-					class="absolute right-3 bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] z-10 h-28 w-40 overflow-hidden rounded-lg shadow-2xl ring-2 ring-white/20 sm:right-6 sm:bottom-6 sm:h-36 sm:w-56 sm:rounded-xl"
+					class="absolute right-3 bottom-[calc(6.75rem+env(safe-area-inset-bottom,0))] z-10 h-28 w-40 overflow-hidden rounded-lg shadow-2xl ring-2 ring-white/20 sm:right-6 sm:bottom-6 sm:h-36 sm:w-56 sm:rounded-xl"
 				>
 					<ParticipantTile participant={localParticipant} {lkState} isActiveSpeaker={false} />
 				</div>

@@ -7,8 +7,17 @@
 	import PreJoin from '$lib/components/PreJoin.svelte';
 	import Room from '$lib/components/Room.svelte';
 	import { onDestroy } from 'svelte';
+	import { z } from 'zod';
 
 	import type { PageData } from './$types';
+
+	const tokenIssueOkSchema = z.object({
+		token: z.string().min(1),
+	});
+
+	const tokenIssueErrSchema = z.object({
+		error: z.string().optional(),
+	});
 
 	let { data }: { data: PageData } = $props();
 
@@ -33,11 +42,29 @@
 				deriveE2EEKey(roomId),
 			]);
 
-			if (!res.ok) throw new Error('Failed to get token');
+			if (!res.ok) {
+				let message = `Failed to get token (${res.status})`;
+				let rawErr: unknown;
+				try {
+					rawErr = await res.json();
+				} catch {
+					rawErr = {};
+				}
+				const parsed = tokenIssueErrSchema.safeParse(rawErr);
+				if (parsed.success && parsed.data.error?.trim()) {
+					message = parsed.data.error.trim();
+				}
+				throw new Error(message);
+			}
 
-			const { token } = await res.json();
+			const raw: unknown = await res.json();
+			const parsedToken = tokenIssueOkSchema.safeParse(raw);
+			if (!parsedToken.success) {
+				throw new Error('Invalid token response');
+			}
+			const { token } = parsedToken.data;
 
-			await lkState.connect(data.publicLivekitUrl, token, e2eeKey);
+			await lkState.connect(data.publicLivekitUrl, token, roomId, e2eeKey);
 
 			if (videoTrack && lkState.room) {
 				await lkState.room.localParticipant.publishTrack(videoTrack, {
