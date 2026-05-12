@@ -4,7 +4,7 @@ import en from './locales/en.json';
 import { goto } from '$app/navigation';
 import type { RequestEvent } from '@sveltejs/kit';
 import { dev } from '$app/environment';
-import { LANGUAGES, Language } from '$lib/languages';
+import { Language } from '$lib/languages';
 import type { RouteId } from '$app/types';
 import { env } from '$env/dynamic/public';
 import { enumFromString } from '$lib/utils';
@@ -83,7 +83,7 @@ function setLocaleCookie(locale: string) {
 }
 
 export function getSupportedLocale(userLocale: Language | null): Language {
-	return userLocale && Object.keys(LANGUAGES).includes(String(userLocale))
+	return userLocale && Object.keys(Language).includes(String(userLocale))
 		? userLocale
 		: DEFAULT_LOCALE;
 }

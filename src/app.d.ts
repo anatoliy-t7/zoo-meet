@@ -1,4 +1,5 @@
-import type { Language } from '$lib/shared/languages';
+import type { Language } from '$lib/languages';
+// import type { Translator } from '$lib/i18n';
 
 declare global {
 	namespace App {
@@ -8,6 +9,7 @@ declare global {
 		}
 		interface PageData {
 			locale: Language;
+			// t: Translator;
 		}
 		// interface PageState {}
 		// interface Platform {}

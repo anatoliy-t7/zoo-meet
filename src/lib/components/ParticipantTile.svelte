@@ -4,6 +4,9 @@
 	import type { LiveKitState } from '$lib/livekit/store.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import { MicOff01Icon } from '@hugeicons/core-free-icons';
+	import { page } from '$app/state';
+
+	let t = $derived(page.data.t);
 
 	let { participant, isActiveSpeaker, lkState } = $props<{
 		participant: Participant;
@@ -106,13 +109,17 @@
 		<div
 			class="absolute top-3 left-3 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1 backdrop-blur-sm hover:bg-white/15
 				{participant.isLocal ? 'hover:bg-brand-dark cursor-pointer' : ''}"
-			title={participant.isLocal ? 'Click to lower hand' : ''}
+			title={participant.isLocal ? t('participant.lower_hand') : ''}
 			onclick={() => {
 				if (participant.isLocal) lkState.toggleRaiseHand();
 			}}
 		>
 			<span class="text-4xl leading-none">✋</span>
-			<span>{participant.isLocal ? 'You' : participant.identity.split(' ')[0]}</span>
+			<span
+				>{participant.isLocal
+					? t('participant.you_hand')
+					: participant.identity.split(' ')[0]}</span
+			>
 		</div>
 	{/if}
 
@@ -121,7 +128,7 @@
 		<div
 			class="bg-meet-panel/80 text-meet-text flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm"
 		>
-			<span>{participant.identity}{participant.isLocal ? ' (You)' : ''}</span>
+			<span>{participant.identity}{participant.isLocal ? t('participant.you') : ''}</span>
 			{#if isAudioMuted}
 				<Icon icon={MicOff01Icon} size={12} color="var(--color-meet-red)" />
 			{/if}

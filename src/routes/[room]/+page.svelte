@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { createLiveKitState } from '$lib/livekit/store.svelte';
 	import { deriveE2EEKey } from '$lib/utils/e2ee';
@@ -21,7 +21,9 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const roomId = $page.params.room ?? '';
+	let t = $derived(page.data.t);
+
+	const roomId = page.params.room ?? '';
 
 	let lkState = createLiveKitState();
 	let joined = $state(false);
@@ -99,16 +101,16 @@
 </script>
 
 <svelte:head>
-	<title>{data.publicBrandName} — Join meeting {roomId}</title>
+	<title>{t('room.page_title', { brandName: data.publicBrandName, roomId })}</title>
 	<meta
 		name="description"
-		content="You've been invited to a {data.publicBrandName} video call. Join now — no account or download required."
+		content={t('room.meta_description', { brandName: data.publicBrandName })}
 	/>
 	<meta name="robots" content="noindex, nofollow" />
-	<meta property="og:title" content="Join a {data.publicBrandName} meeting" />
+	<meta property="og:title" content={t('room.og_title', { brandName: data.publicBrandName })} />
 	<meta
 		property="og:description"
-		content="You've been invited to a secure, end-to-end encrypted video call on {data.publicBrandName}. Join in one click."
+		content={t('room.og_description', { brandName: data.publicBrandName })}
 	/>
 	<meta property="og:image" content="/hero.webp" />
 </svelte:head>
@@ -117,13 +119,13 @@
 	{#if error}
 		<div class="bg-meet-bg text-meet-text fixed inset-0 z-50 flex items-center justify-center">
 			<div class="bg-meet-panel border-meet-border max-w-md rounded-3xl border p-6 text-center">
-				<h2 class="mb-2 text-xl font-semibold">Connection Error</h2>
+				<h2 class="mb-2 text-xl font-semibold">{t('room.connection_error')}</h2>
 				<p class="text-meet-text-muted mb-4">{error}</p>
 				<button
 					onclick={() => goto('/')}
 					class="bg-meet-text text-meet-bg hover:bg-meet-text-muted rounded-full px-6 py-2 font-medium transition-colors"
 				>
-					Go Back
+					{t('room.go_back')}
 				</button>
 			</div>
 		</div>

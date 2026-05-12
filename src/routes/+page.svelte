@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { PUBLIC_BRAND_NAME } from '$env/static/public';
 	import { generateRoomId } from '$lib/utils/id';
 	import Icon from '$lib/components/Icon.svelte';
@@ -13,24 +14,23 @@
 		SourceCodeIcon,
 	} from '@hugeicons/core-free-icons';
 
-	const features = [
+	let t = $derived(page.data.t);
+
+	const featureItems = [
 		{
 			icon: ShieldKeyIcon,
-			title: 'End-to-end encrypted',
-			description:
-				'Every session is encrypted in transit. Only people in the room can see or hear anything — not even us.',
+			titleKey: 'home.feature_e2ee_title',
+			descKey: 'home.feature_e2ee_description',
 		},
 		{
 			icon: AnonymousIcon,
-			title: 'No account required',
-			description:
-				'Start or join a meeting in seconds. No sign-up, no downloads, no friction. Just share the link.',
+			titleKey: 'home.feature_no_account_title',
+			descKey: 'home.feature_no_account_description',
 		},
 		{
 			icon: SourceCodeIcon,
-			title: 'Fully open source',
-			description:
-				'The entire codebase is public. Audit it, fork it, self-host it — transparency is the default.',
+			titleKey: 'home.feature_open_source_title',
+			descKey: 'home.feature_open_source_description',
 		},
 	] as const;
 
@@ -55,22 +55,13 @@
 </script>
 
 <svelte:head>
-	<title>{PUBLIC_BRAND_NAME} — Free, Private Video Calls</title>
-	<meta
-		name="description"
-		content="One link. No sign-up. No downloads. Meet face-to-face from anywhere — every call is end-to-end encrypted so only the people in the room can see or hear anything."
-	/>
-	<meta property="og:title" content="{PUBLIC_BRAND_NAME} — Free, Private Video Calls" />
-	<meta
-		property="og:description"
-		content="Start a secure video meeting in seconds. No account, no downloads. Every call is end-to-end encrypted."
-	/>
+	<title>{t('home.title', { brandName: PUBLIC_BRAND_NAME })}</title>
+	<meta name="description" content={t('home.meta_description')} />
+	<meta property="og:title" content={t('home.title', { brandName: PUBLIC_BRAND_NAME })} />
+	<meta property="og:description" content={t('home.og_description')} />
 	<meta property="og:image" content="/hero.webp" />
-	<meta name="twitter:title" content="{PUBLIC_BRAND_NAME} — Free, Private Video Calls" />
-	<meta
-		name="twitter:description"
-		content="Start a secure video meeting in seconds. No account, no downloads. Every call is end-to-end encrypted."
-	/>
+	<meta name="twitter:title" content={t('home.title', { brandName: PUBLIC_BRAND_NAME })} />
+	<meta name="twitter:description" content={t('home.og_description')} />
 	<meta name="twitter:image" content="/hero.webp" />
 </svelte:head>
 
@@ -95,7 +86,7 @@
 						d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"
 					/>
 				</svg>
-				GitHub
+				{t('home.view_source')}
 			</a>
 		</nav>
 	</div>
@@ -103,18 +94,17 @@
 	<main class="mx-auto grid max-w-7xl gap-16 px-6 py-32 lg:flex lg:items-center">
 		<div class="lg:w-1/2">
 			<h1 class="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
-				Meet face-to-face,<br />from anywhere on Earth.
+				{t('home.hero_title_1')}<br />{t('home.hero_title_2')}
 			</h1>
 			<p class="text-muted-foreground mb-10 text-lg leading-relaxed">
-				One link. No sign-up. No downloads. Your conversation stays between you — every call is
-				end-to-end encrypted, so nobody else can listen in.
+				{t('home.hero_description')}
 			</p>
 
 			<div class="flex flex-col gap-4 sm:flex-row">
 				<Button onclick={handleStartMeeting} size="lg">
 					<Icon icon={Video01Icon} />
 
-					New meeting
+					{t('home.new_meeting')}
 				</Button>
 
 				<div class="relative flex flex-1">
@@ -128,7 +118,7 @@
 						bind:value={joinCode}
 						onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleJoinMeeting()}
 						class="focus-visible:border-ring h-14 rounded-l-full rounded-r-none border-r-0 pl-14 text-lg focus-visible:ring-0"
-						placeholder="Enter a code or link"
+						placeholder={t('home.enter_code')}
 					/>
 					<Button
 						onclick={handleJoinMeeting}
@@ -137,14 +127,14 @@
 						size="lg"
 						class="border-border rounded-l-none border border-l-0"
 					>
-						Join
+						{t('home.join')}
 					</Button>
 				</div>
 			</div>
 		</div>
 
 		<div class="lg:w-1/2">
-			<div class="relative overflow-hidden rounded-3xl shadow-2xl">
+			<div class="relative overflow-hidden rounded-2xl shadow-2xl">
 				<img
 					src="/hero.webp"
 					alt="{PUBLIC_BRAND_NAME} video call interface"
@@ -158,13 +148,13 @@
 	<section class="border-border border-t">
 		<div class="mx-auto max-w-7xl px-6">
 			<div class="divide-border grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-				{#each features as feature (feature.title)}
+				{#each featureItems as feature (feature.titleKey)}
 					<div class="flex flex-col gap-3 py-10 sm:px-10 sm:first:pl-0 sm:last:pr-0">
 						<div class="bg-primary/10 flex size-10 items-center justify-center rounded-xl">
 							<Icon icon={feature.icon} size={20} color="var(--brand)" />
 						</div>
-						<h3 class="font-semibold">{feature.title}</h3>
-						<p class="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+						<h3 class="font-semibold">{t(feature.titleKey)}</h3>
+						<p class="text-muted-foreground text-sm leading-relaxed">{t(feature.descKey)}</p>
 					</div>
 				{/each}
 			</div>
@@ -180,7 +170,7 @@
 					<Icon icon={Video01Icon} size={13} color="black" />
 				</div>
 				<span class="text-sm font-semibold">{PUBLIC_BRAND_NAME}</span>
-				<span class="text-muted-foreground text-sm">— free, open-source video calls</span>
+				<span class="text-muted-foreground text-sm">{t('home.footer_tagline')}</span>
 			</div>
 
 			<div class="text-muted-foreground flex items-center gap-6 text-sm">
@@ -195,9 +185,14 @@
 							d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"
 						/>
 					</svg>
-					View source
+					{t('home.view_source')}
 				</a>
-				<span>© {new Date().getFullYear()} {PUBLIC_BRAND_NAME}</span>
+				<span
+					>{t('home.footer_copyright', {
+						year: new Date().getFullYear(),
+						brandName: PUBLIC_BRAND_NAME,
+					})}</span
+				>
 			</div>
 		</div>
 	</footer>

@@ -3,6 +3,7 @@
 	import type { LiveKitState } from '$lib/livekit/store.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { page } from '$app/state';
 	import {
 		Mic01Icon,
 		MicOff01Icon,
@@ -26,6 +27,8 @@
 			toggleReactions: () => void;
 			isReactionsOpen: boolean;
 		}>();
+
+	let t = $derived(page.data.t);
 
 	let isMicOn = $derived(
 		(lkState.trackChangeCount, lkState.room?.localParticipant.isMicrophoneEnabled ?? false)
@@ -115,7 +118,9 @@
 	);
 
 	let chatAriaLabel = $derived(
-		lkState.unreadChatCount > 0 ? `Chat, ${lkState.unreadChatCount} unread messages` : 'Chat'
+		lkState.unreadChatCount > 0
+			? t('control.chat_unread', { count: lkState.unreadChatCount })
+			: t('control.chat')
 	);
 </script>
 
@@ -145,7 +150,7 @@
 					<p
 						class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest uppercase"
 					>
-						Select a microphone
+						{t('control.select_microphone')}
 					</p>
 					{#each audioDevices as d (d.deviceId)}
 						<button
@@ -157,11 +162,11 @@
 							{:else}
 								<span class="size-3.5"></span>
 							{/if}
-							<span class="truncate">{d.label || 'Microphone'}</span>
+							<span class="truncate">{d.label || t('control.microphone')}</span>
 						</button>
 					{/each}
 					{#if audioDevices.length === 0}
-						<p class="text-meet-text-muted px-3 py-2 text-sm">No devices found</p>
+						<p class="text-meet-text-muted px-3 py-2 text-sm">{t('control.no_devices')}</p>
 					{/if}
 				</div>
 			{/if}
@@ -174,14 +179,14 @@
 				<Button
 					onclick={() => lkState.toggleMicrophone()}
 					class="text-meet-text hover:bg-meet-btn-hover h-10 rounded-none rounded-l-full border-none bg-transparent pr-2 pl-3 shadow-none sm:h-12 sm:pr-3 sm:pl-4"
-					aria-label={isMicOn ? 'Mute microphone' : 'Unmute microphone'}
+					aria-label={isMicOn ? t('control.mute_mic') : t('control.unmute_mic')}
 				>
 					<Icon icon={Mic01Icon} altIcon={MicOff01Icon} showAlt={!isMicOn} />
 				</Button>
 				<Button
 					onclick={() => togglePicker('mic')}
 					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-10 rounded-none rounded-r-full border-y-0 border-r-0 border-l bg-transparent pr-2 pl-1 shadow-none sm:h-12 sm:pr-3"
-					aria-label="Select microphone"
+					aria-label={t('control.select_mic')}
 					aria-expanded={openPicker === 'mic'}
 				>
 					<Icon
@@ -202,7 +207,7 @@
 					<p
 						class="text-meet-text-muted px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest uppercase"
 					>
-						Select a camera
+						{t('control.select_camera')}
 					</p>
 					{#each videoDevices as d (d.deviceId)}
 						<button
@@ -214,11 +219,11 @@
 							{:else}
 								<span class="size-3.5"></span>
 							{/if}
-							<span class="truncate">{d.label || 'Camera'}</span>
+							<span class="truncate">{d.label || t('control.camera')}</span>
 						</button>
 					{/each}
 					{#if videoDevices.length === 0}
-						<p class="text-meet-text-muted px-3 py-2 text-sm">No devices found</p>
+						<p class="text-meet-text-muted px-3 py-2 text-sm">{t('control.no_devices')}</p>
 					{/if}
 				</div>
 			{/if}
@@ -231,14 +236,14 @@
 				<Button
 					onclick={() => lkState.toggleCamera()}
 					class="text-meet-text hover:bg-meet-btn-hover h-10 rounded-none rounded-l-full border-none bg-transparent pr-2 pl-3 shadow-none sm:h-12 sm:pr-3 sm:pl-4"
-					aria-label={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
+					aria-label={isVideoOn ? t('control.turn_off_camera') : t('control.turn_on_camera')}
 				>
 					<Icon icon={Video01Icon} altIcon={VideoOffIcon} showAlt={!isVideoOn} />
 				</Button>
 				<Button
 					onclick={() => togglePicker('cam')}
 					class="border-meet-text/15 text-meet-text hover:bg-meet-btn-hover h-10 rounded-none rounded-r-full border-y-0 border-r-0 border-l bg-transparent pr-2 pl-1 shadow-none sm:h-12 sm:pr-3"
-					aria-label="Select camera"
+					aria-label={t('control.select_cam')}
 					aria-expanded={openPicker === 'cam'}
 				>
 					<Icon
@@ -258,7 +263,7 @@
 				: ''}"
 			size="icon-lg"
 			variant="secondary"
-			aria-label="Share screen"
+			aria-label={t('control.share_screen')}
 		>
 			<Icon icon={ComputerScreenShareIcon} />
 		</Button>
@@ -271,7 +276,7 @@
 				: ''}"
 			size="icon-lg"
 			variant="secondary"
-			aria-label="Participants"
+			aria-label={t('control.participants')}
 		>
 			<Icon icon={UserGroupIcon} />
 			<span
@@ -307,7 +312,7 @@
 				class={isReactionsOpen || isHandRaised ? 'bg-meet-btn-active text-meet-text' : ''}
 				size="icon-lg"
 				variant="secondary"
-				aria-label="Reactions"
+				aria-label={t('control.reactions')}
 				aria-expanded={isReactionsOpen}
 			>
 				{#if isHandRaised}
@@ -346,8 +351,8 @@
 							toggleReactions();
 							lkState.toggleRaiseHand();
 						}}
-						aria-label={isHandRaised ? 'Lower hand' : 'Raise hand'}
-						title={isHandRaised ? 'Lower hand' : 'Raise hand'}
+						aria-label={isHandRaised ? t('control.lower_hand') : t('control.raise_hand')}
+						title={isHandRaised ? t('control.lower_hand') : t('control.raise_hand')}
 					>
 						✋
 					</button>
@@ -371,7 +376,7 @@
 				: ''}"
 			size="icon-lg"
 			variant="secondary"
-			aria-label="Settings"
+			aria-label={t('control.settings')}
 		>
 			<Icon icon={Settings01Icon} />
 		</Button>
@@ -381,7 +386,7 @@
 			onclick={onLeave}
 			class="bg-meet-red hover:bg-meet-red-hover h-10 shrink-0 rounded-full border-none px-4 text-sm font-medium text-white shadow-none sm:ml-2 sm:h-12 sm:px-6 sm:text-[15px]"
 		>
-			Leave
+			{t('control.leave')}
 		</Button>
 	</div>
 

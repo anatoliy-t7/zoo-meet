@@ -21,6 +21,9 @@
 		LockPasswordIcon,
 	} from '@hugeicons/core-free-icons';
 	import { PersistedState } from 'runed';
+	import { page } from '$app/state';
+
+	let t = $derived(page.data.t);
 
 	let { onJoin } = $props<{
 		onJoin: (name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) => void;
@@ -161,12 +164,12 @@
 					<div
 						class="bg-primary text-primary-foreground flex size-20 items-center justify-center rounded-full text-2xl font-bold uppercase"
 					>
-						{name ? name.charAt(0) : '?'}
+						{name ? name.charAt(0) : t('prejoin.guest').charAt(0)}
 					</div>
 				{/if}
 
 				<div class="absolute bottom-4 left-5 text-sm font-medium">
-					{name || 'Guest'}
+					{name || t('prejoin.guest')}
 				</div>
 
 				<div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3">
@@ -175,7 +178,7 @@
 						size="icon"
 						onclick={toggleAudio}
 						class="border-border bg-secondary/90 size-14 rounded-full"
-						aria-label={isAudioEnabled ? 'Mute microphone' : 'Unmute microphone'}
+						aria-label={isAudioEnabled ? t('prejoin.mute_mic') : t('prejoin.unmute_mic')}
 					>
 						<Icon icon={Mic01Icon} altIcon={MicOff01Icon} showAlt={!isAudioEnabled} />
 					</Button>
@@ -184,7 +187,7 @@
 						size="icon"
 						onclick={toggleVideo}
 						class="border-border bg-secondary/90 size-14 rounded-full"
-						aria-label={isVideoEnabled ? 'Turn off camera' : 'Turn on camera'}
+						aria-label={isVideoEnabled ? t('prejoin.turn_off_camera') : t('prejoin.turn_on_camera')}
 					>
 						<Icon icon={Video01Icon} altIcon={VideoOffIcon} showAlt={!isVideoEnabled} />
 					</Button>
@@ -194,7 +197,7 @@
 			<!-- Device selectors -->
 			<div class="flex gap-4">
 				<div class="flex flex-1 flex-col gap-1">
-					<Label class="text-muted-foreground pl-2.5">Microphone</Label>
+					<Label class="text-muted-foreground pl-2.5">{t('prejoin.microphone')}</Label>
 					<Select.Root
 						type="single"
 						bind:value={selectedAudioDevice}
@@ -203,22 +206,22 @@
 						<Select.Trigger>
 							<span class="max-w-56 truncate">
 								{audioDevices.find((d) => d.deviceId === selectedAudioDevice)?.label ||
-									'Default microphone'}
+									t('prejoin.default_microphone')}
 							</span>
 						</Select.Trigger>
 						<Select.Content>
 							{#if audioDevices.length === 0}
-								<Select.Item value="" label="Default microphone" />
+								<Select.Item value="" label={t('prejoin.default_microphone')} />
 							{:else}
 								{#each audioDevices as d (d.deviceId)}
-									<Select.Item value={d.deviceId} label={d.label || 'Microphone'} />
+									<Select.Item value={d.deviceId} label={d.label || t('prejoin.microphone')} />
 								{/each}
 							{/if}
 						</Select.Content>
 					</Select.Root>
 				</div>
 				<div class="flex flex-1 flex-col gap-1">
-					<Label class="text-muted-foreground pl-2.5">Camera</Label>
+					<Label class="text-muted-foreground pl-2.5">{t('prejoin.camera')}</Label>
 					<Select.Root
 						type="single"
 						bind:value={selectedVideoDevice}
@@ -227,15 +230,15 @@
 						<Select.Trigger>
 							<span class="max-w-56 truncate">
 								{videoDevices.find((d) => d.deviceId === selectedVideoDevice)?.label ||
-									'Default camera'}
+									t('prejoin.default_camera')}
 							</span>
 						</Select.Trigger>
 						<Select.Content>
 							{#if videoDevices.length === 0}
-								<Select.Item value="" label="Default camera" />
+								<Select.Item value="" label={t('prejoin.default_camera')} />
 							{:else}
 								{#each videoDevices as d (d.deviceId)}
-									<Select.Item value={d.deviceId} label={d.label || 'Camera'} />
+									<Select.Item value={d.deviceId} label={d.label || t('prejoin.camera')} />
 								{/each}
 							{/if}
 						</Select.Content>
@@ -245,25 +248,27 @@
 		</div>
 
 		<!-- Right: Join form -->
-		<div class="flex w-full flex-col pt-8 md:w-100 md:pt-0">
-			<h2 class="mb-3 text-center text-3xl font-semibold">Join room</h2>
+		<div class="flex w-full flex-col pt-8 md:w-[400px] md:pt-0">
+			<h2 class="mb-3 text-center text-3xl font-semibold">{t('prejoin.join_room')}</h2>
 			<p class="text-muted-foreground mb-5 text-center text-[15px] leading-relaxed md:text-left">
-				End-to-end encrypted — only participants in this meeting can see or hear anything.
+				{t('prejoin.e2ee_description')}
 			</p>
 			<div class="text-brand mb-6 flex items-center gap-2 text-sm font-medium">
 				<Icon icon={LockPasswordIcon} size={16} />
-				End-to-end encrypted
+				{t('prejoin.e2ee_badge')}
 			</div>
 
 			<div class="space-y-5">
 				<div class="flex flex-col gap-1.5">
-					<Label for="name-input" class="text-muted-foreground pl-2.5">Your name</Label>
+					<Label for="name-input" class="text-muted-foreground pl-2.5"
+						>{t('prejoin.your_name')}</Label
+					>
 					<Input
 						id="name-input"
 						type="text"
 						bind:value={name}
 						onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleJoin()}
-						placeholder="Enter your name"
+						placeholder={t('prejoin.enter_name')}
 					/>
 				</div>
 
@@ -277,7 +282,7 @@
 						}}
 					/>
 					<Label for="remember-name" class="text-muted-foreground">
-						Remember my name on this device
+						{t('prejoin.remember_name')}
 					</Label>
 				</div>
 
@@ -286,7 +291,7 @@
 					disabled={!name.trim()}
 					class="w-full rounded-full py-6 text-[15px] font-semibold"
 				>
-					Start meeting
+					{t('prejoin.start_meeting')}
 				</Button>
 			</div>
 		</div>

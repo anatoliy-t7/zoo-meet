@@ -12,6 +12,9 @@
 	import { LockPasswordIcon } from '@hugeicons/core-free-icons';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { page } from '$app/state';
+
+	let t = $derived(page.data.t);
 
 	let { lkState, onLeave } = $props<{ lkState: LiveKitState; onLeave: () => void }>();
 
@@ -29,7 +32,9 @@
 	);
 
 	$effect(() => {
-		lkState.setChatSidebarOpen(activeSidebar === 'chat');
+		if (lkState.setChatSidebarOpen) {
+			lkState.setChatSidebarOpen(activeSidebar === 'chat');
+		}
 	});
 
 	function toggleSidebar(panel: NonNullable<Sidebar>) {
@@ -94,7 +99,7 @@
 						class="bg-meet-red/90 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white backdrop-blur-sm"
 					>
 						<Icon icon={LockPasswordIcon} size={13} />
-						Meeting locked
+						{t('room.meeting_locked')}
 					</div>
 				{/if}
 			</div>
@@ -117,10 +122,10 @@
 			<button
 				type="button"
 				class="fixed inset-0 z-30 bg-black/50 sm:hidden"
-				aria-label="Close panel"
+				aria-label={t('room.close_panel')}
 				onclick={() => (activeSidebar = null)}
 			>
-				<span class="sr-only">Close panel</span>
+				<span class="sr-only">{t('room.close_panel')}</span>
 			</button>
 			<div
 				class="bg-popover fixed inset-0 z-40 m-0 flex max-h-none flex-col overflow-hidden rounded-none sm:relative sm:inset-auto sm:z-auto sm:m-4 sm:max-h-[min(calc(100vh-2rem),calc(100dvh-2rem))] sm:w-96 sm:shrink-0 sm:overflow-hidden sm:rounded-xl"
@@ -166,17 +171,17 @@
 >
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Are you sure you want to leave?</Dialog.Title>
-			<Dialog.Description>You will leave the meeting. Others will continue.</Dialog.Description>
+			<Dialog.Title>{t('room.leave_confirm_title')}</Dialog.Title>
+			<Dialog.Description>{t('room.leave_confirm_description')}</Dialog.Description>
 		</Dialog.Header>
 
 		<Dialog.Footer class="gap-3 sm:flex-col">
 			<Button onclick={handleLeaveConfirm} variant="destructive" size="lg" class="w-full">
-				Leave meeting
+				{t('room.leave_meeting')}
 			</Button>
 
 			<Dialog.Close class={buttonVariants({ variant: 'secondary', size: 'lg' })}>
-				Stay in meeting
+				{t('room.stay_in_meeting')}
 			</Dialog.Close>
 		</Dialog.Footer>
 	</Dialog.Content>

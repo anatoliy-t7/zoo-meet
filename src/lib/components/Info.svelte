@@ -6,12 +6,14 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Cancel01Icon } from '@hugeicons/core-free-icons';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Clipboard from '$lib/components/ui/clipboard/clipboard.svelte';
+
+	let t = $derived(page.data.t);
 
 	let { lkState, onClose } = $props<{ lkState: LiveKitState; onClose: () => void }>();
 
-	let meetingUrl = $derived(typeof window !== 'undefined' ? window.location.href : $page.url.href);
+	let meetingUrl = $derived(typeof window !== 'undefined' ? window.location.href : page.url.href);
 	let joinedAt = new Date().toLocaleTimeString([], {
 		hour: '2-digit',
 		minute: '2-digit',
@@ -21,13 +23,13 @@
 
 <div class="text-foreground flex h-full flex-col">
 	<div class="flex h-16 shrink-0 items-center justify-between px-5">
-		<h3 class="text-lg font-semibold">Info</h3>
+		<h3 class="text-lg font-semibold">{t('info.title')}</h3>
 		<Button
 			variant="ghost"
 			size="icon"
 			onclick={onClose}
 			class="rounded-full"
-			aria-label="Close info"
+			aria-label={t('info.close')}
 		>
 			<Icon icon={Cancel01Icon} size={18} />
 		</Button>
@@ -38,14 +40,16 @@
 		<div class="space-y-4">
 			<!-- Meeting details -->
 			<div class="bg-card space-y-3 rounded-xl p-4">
-				<p class="text-muted-foreground text-xs tracking-widest uppercase">Meeting details</p>
+				<p class="text-muted-foreground text-xs tracking-widest uppercase">
+					{t('info.meeting_details')}
+				</p>
 				<div class="space-y-3 text-sm">
 					<div class="flex items-center justify-between gap-4">
-						<span class="text-muted-foreground shrink-0">Room</span>
+						<span class="text-muted-foreground shrink-0">{t('info.room')}</span>
 						<span class="text-right font-mono break-all">{lkState.room?.name ?? ''}</span>
 					</div>
 					<div>
-						<span class="text-muted-foreground block">Invite link</span>
+						<span class="text-muted-foreground block">{t('info.invite_link')}</span>
 						<div class="flex items-center gap-1">
 							<span class="text-primary flex-1 break-all">{meetingUrl}</span>
 							<Clipboard text={meetingUrl} />
@@ -57,7 +61,9 @@
 			<!-- Participants -->
 			<div class="bg-card space-y-3 rounded-xl p-4">
 				<div class="flex items-center gap-2">
-					<p class="text-muted-foreground text-xs tracking-widest uppercase">Participants</p>
+					<p class="text-muted-foreground text-xs tracking-widest uppercase">
+						{t('info.participants')}
+					</p>
 					<Badge variant="secondary" class="h-4 px-1.5 py-0 text-xs"
 						>{lkState.participants.length}</Badge
 					>
@@ -70,7 +76,7 @@
 							>
 								{p.identity.charAt(0)}
 							</div>
-							<span>{p.identity}{p.isLocal ? ' (You)' : ''}</span>
+							<span>{p.identity}{p.isLocal ? t('participant.you') : ''}</span>
 						</div>
 					{/each}
 				</div>
@@ -78,10 +84,10 @@
 
 			<!-- Activity -->
 			<div class="bg-card space-y-3 rounded-xl p-4">
-				<p class="text-muted-foreground text-xs tracking-widest uppercase">Activity</p>
+				<p class="text-muted-foreground text-xs tracking-widest uppercase">{t('info.activity')}</p>
 				<div class="flex gap-4 text-sm">
 					<span class="text-muted-foreground shrink-0 font-mono">{joinedAt}</span>
-					<span>Joined room</span>
+					<span>{t('info.joined_room')}</span>
 				</div>
 			</div>
 		</div>
