@@ -17,7 +17,7 @@ ZooMeet is a secure, open-source video conferencing application powered by LiveK
 
 | Layer | Technology |
 |---|---|
-| Frontend | SvelteKit, Svelte 5, Tailwind CSS, Lucide Icons |
+| Frontend | SvelteKit, Svelte 5, Tailwind CSS |
 | WebRTC Client | `livekit-client` |
 | Backend / API | SvelteKit API routes, `livekit-server-sdk` |
 | Infrastructure | Docker, Docker Compose, LiveKit Server, Valkey |

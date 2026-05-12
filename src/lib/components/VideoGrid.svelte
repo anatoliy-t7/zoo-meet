@@ -36,6 +36,7 @@
 			aspectRatio: '16:9',
 			gap: 12,
 			layoutMode: 'gallery',
+			disableFloat: true,
 		});
 
 		return participants.map((p, i) => {

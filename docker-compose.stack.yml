@@ -16,7 +16,7 @@ services:
     ports:
       - "7880:7880"
       - "7881:7881"
-      - "50000-60000:50000-60000/udp"
+      - "40000-40100:40000-40100/udp"
     volumes:
       - ./livekit.yaml.template:/etc/livekit.template.yaml:ro
     depends_on:
