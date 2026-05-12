@@ -45,7 +45,10 @@ export const POST: RequestHandler = async ({ request }) => {
 				const roomSvc = new RoomServiceClient(lkHttpUrl, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
 				const rooms = await roomSvc.listRooms([cleanRoom]);
 				const existing = rooms[0];
-				if (existing?.metadata !== undefined && isMeetingRoomLockedFromMetadata(existing.metadata)) {
+				if (
+					existing?.metadata !== undefined &&
+					isMeetingRoomLockedFromMetadata(existing.metadata)
+				) {
 					const participants = await roomSvc.listParticipants(cleanRoom);
 					const alreadyInRoom = participants.some((p) => p.identity === cleanName);
 					if (!alreadyInRoom) {

@@ -10,10 +10,9 @@ export type WithoutChildren<T> = T extends { children?: unknown } ? Omit<T, 'chi
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
-
 export const enumFromString = <T extends Record<string, string>>(
-  e: T,
-  value: string
+	e: T,
+	value: string
 ): T[keyof T] | undefined => {
-  return (Object.values(e) as string[]).includes(value) ? (value as T[keyof T]) : undefined;
+	return (Object.values(e) as string[]).includes(value) ? (value as T[keyof T]) : undefined;
 };

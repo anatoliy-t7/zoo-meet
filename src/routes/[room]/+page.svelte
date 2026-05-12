@@ -27,7 +27,11 @@
 	let joined = $state(false);
 	let error = $state<string | null>(null);
 
-	async function handleJoin(name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) {
+	async function handleJoin(
+		name: string,
+		videoTrack?: LocalVideoTrack,
+		audioTrack?: LocalAudioTrack
+	) {
 		try {
 			if (!data.publicLivekitUrl) {
 				throw new Error('LiveKit URL is not configured');
@@ -96,17 +100,23 @@
 
 <svelte:head>
 	<title>{data.publicBrandName} — Join meeting {roomId}</title>
-	<meta name="description" content="You've been invited to a {data.publicBrandName} video call. Join now — no account or download required." />
+	<meta
+		name="description"
+		content="You've been invited to a {data.publicBrandName} video call. Join now — no account or download required."
+	/>
 	<meta name="robots" content="noindex, nofollow" />
 	<meta property="og:title" content="Join a {data.publicBrandName} meeting" />
-	<meta property="og:description" content="You've been invited to a secure, end-to-end encrypted video call on {data.publicBrandName}. Join in one click." />
+	<meta
+		property="og:description"
+		content="You've been invited to a secure, end-to-end encrypted video call on {data.publicBrandName}. Join in one click."
+	/>
 	<meta property="og:image" content="/hero.webp" />
 </svelte:head>
 
 {#if !joined}
 	{#if error}
 		<div class="bg-meet-bg text-meet-text fixed inset-0 z-50 flex items-center justify-center">
-			<div class="bg-meet-panel border-meet-border rounded-3xl border p-6 text-center max-w-md">
+			<div class="bg-meet-panel border-meet-border max-w-md rounded-3xl border p-6 text-center">
 				<h2 class="mb-2 text-xl font-semibold">Connection Error</h2>
 				<p class="text-meet-text-muted mb-4">{error}</p>
 				<button

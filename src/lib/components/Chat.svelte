@@ -57,7 +57,7 @@
 							})}
 						</span>
 					</div>
-					<div class="bg-secondary max-w-[90%] rounded-2xl px-4 py-2 text-sm break-words">
+					<div class="bg-secondary max-w-[90%] rounded-2xl px-4 py-2 text-sm wrap-break-word">
 						{msg.text}
 					</div>
 				</div>

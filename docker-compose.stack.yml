@@ -2,7 +2,7 @@
 services:
   livekit:
     image: livekit/livekit-server:latest
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: ['/bin/sh', '-c']
     command:
       - |
         set -eu
@@ -14,9 +14,9 @@ services:
       LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
       LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
     ports:
-      - "7880:7880"
-      - "7881:7881"
-      - "40000-40100:40000-40100/udp"
+      - '7880:7880'
+      - '7881:7881'
+      - '40000-40100:40000-40100/udp'
     volumes:
       - ./livekit.yaml.template:/etc/livekit.template.yaml:ro
     depends_on:
@@ -29,7 +29,7 @@ services:
     image: valkey/valkey:7-alpine
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - '6379:6379'
     networks:
       - default
       - dokploy-network

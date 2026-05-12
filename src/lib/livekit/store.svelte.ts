@@ -334,7 +334,9 @@ export class LiveKitState {
 		this.room.remoteParticipants.forEach((p) => {
 			const pub = p.getTrackPublication(Track.Source.Camera) as RemoteTrackPublication | undefined;
 			pub?.setSubscribed(enabled);
-			const screenPub = p.getTrackPublication(Track.Source.ScreenShare) as RemoteTrackPublication | undefined;
+			const screenPub = p.getTrackPublication(Track.Source.ScreenShare) as
+				| RemoteTrackPublication
+				| undefined;
 			screenPub?.setSubscribed(enabled);
 		});
 	}

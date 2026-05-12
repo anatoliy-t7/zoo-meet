@@ -145,7 +145,7 @@
 >
 	<div class="flex w-full max-w-5xl flex-col items-center justify-center gap-12 md:flex-row">
 		<!-- Left: Video Preview -->
-		<div class="flex w-full flex-col gap-4 md:w-[600px]">
+		<div class="flex w-full flex-col gap-4 md:w-150">
 			<div
 				class="bg-card relative flex aspect-16/10 w-full items-center justify-center overflow-hidden rounded-3xl shadow-lg"
 			>
@@ -245,7 +245,7 @@
 		</div>
 
 		<!-- Right: Join form -->
-		<div class="flex w-full flex-col pt-8 md:w-[400px] md:pt-0">
+		<div class="flex w-full flex-col pt-8 md:w-100 md:pt-0">
 			<h2 class="mb-3 text-center text-3xl font-semibold">Join room</h2>
 			<p class="text-muted-foreground mb-5 text-center text-[15px] leading-relaxed md:text-left">
 				End-to-end encrypted — only participants in this meeting can see or hear anything.

@@ -13,7 +13,8 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'Referrer-Policy': 'strict-origin-when-cross-origin',
 
 	// Permissions policy — restrict unused browser features
-	'Permissions-Policy': 'camera=self, microphone=self, display-capture=self, geolocation=(), payment=()',
+	'Permissions-Policy':
+		'camera=self, microphone=self, display-capture=self, geolocation=(), payment=()',
 
 	// HSTS — enable when behind HTTPS in production
 	// 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',

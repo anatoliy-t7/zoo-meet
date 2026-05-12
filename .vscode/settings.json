@@ -1,9 +1,4 @@
 {
-  "cSpell.words": [
-    "LIVEKIT"
-  ],
-  "i18n-ally.localesPaths": [
-    "src/lib/i18n",
-    "src/lib/i18n/locales"
-  ]
+	"cSpell.words": ["LIVEKIT"],
+	"i18n-ally.localesPaths": ["src/lib/i18n", "src/lib/i18n/locales"]
 }

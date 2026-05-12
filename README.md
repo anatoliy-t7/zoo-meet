@@ -15,11 +15,11 @@ ZooMeet is a secure, open-source video conferencing application powered by LiveK
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | SvelteKit, Svelte 5, Tailwind CSS |
-| WebRTC Client | `livekit-client` |
-| Backend / API | SvelteKit API routes, `livekit-server-sdk` |
+| Layer          | Technology                                     |
+| -------------- | ---------------------------------------------- |
+| Frontend       | SvelteKit, Svelte 5, Tailwind CSS              |
+| WebRTC Client  | `livekit-client`                               |
+| Backend / API  | SvelteKit API routes, `livekit-server-sdk`     |
 | Infrastructure | Docker, Docker Compose, LiveKit Server, Valkey |
 
 ## Getting Started (Local Development)
@@ -34,17 +34,20 @@ The easiest way to run the full stack locally is with Docker Compose, which star
 ### Running the Full Stack
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/anatoliy-t7/zoo-meet.git
    cd zoo-meet
    ```
 
 2. **Create the Compose network Dokploy uses** (once per machine; harmless if it already exists):
+
    ```bash
    docker network create dokploy-network
    ```
 
 3. Start everything:
+
    ```bash
    docker compose up --build
    ```
@@ -61,17 +64,20 @@ The easiest way to run the full stack locally is with Docker Compose, which star
 If you want hot module replacement during development, run LiveKit in Docker and the frontend locally:
 
 1. Create the network if needed, then start only the backend services:
+
    ```bash
    docker network create dokploy-network 2>/dev/null || true
    docker compose up livekit valkey -d
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Start the dev server:
+
    ```bash
    pnpm dev
    ```
@@ -96,25 +102,24 @@ PUBLIC_BRAND_NAME=ZooMeet
 
 ### Variable Reference
 
-| Variable | Required | Description |
-|---|---|---|
-| `LIVEKIT_API_KEY` | Yes | LiveKit API key id; must match the secret you set next to `keys:` in the **rendered** server config (same value is baked in via `livekit.yaml.template` at startup) |
-| `LIVEKIT_API_SECRET` | Yes | LiveKit API secret; paired with `LIVEKIT_API_KEY` for token signing and for `keys:` in the rendered config |
-| `PUBLIC_LIVEKIT_URL` | Yes | WebSocket URL of your LiveKit server, visible to the browser |
-| `PUBLIC_BRAND_NAME` | No | App name rendered in the UI, `<title>`, and Open Graph tags. Defaults to `ZooMeet` |
+| Variable             | Required | Description                                                                                                                                                         |
+| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LIVEKIT_API_KEY`    | Yes      | LiveKit API key id; must match the secret you set next to `keys:` in the **rendered** server config (same value is baked in via `livekit.yaml.template` at startup) |
+| `LIVEKIT_API_SECRET` | Yes      | LiveKit API secret; paired with `LIVEKIT_API_KEY` for token signing and for `keys:` in the rendered config                                                          |
+| `PUBLIC_LIVEKIT_URL` | Yes      | WebSocket URL of your LiveKit server, visible to the browser                                                                                                        |
+| `PUBLIC_BRAND_NAME`  | No       | App name rendered in the UI, `<title>`, and Open Graph tags. Defaults to `ZooMeet`                                                                                  |
 
 > **Production**: Use strong random `LIVEKIT_*` values. Keep them only in Dokploy (or your secrets store), not in the repo.
-
 
 ### Deploy with the image (no app build on the server)
 
 Compose layout:
 
-| File | Role |
-|------|------|
-| [`docker-compose.stack.yml`](docker-compose.stack.yml) | LiveKit + Valkey + `dokploy-network` (shared) |
-| [`docker-compose.yml`](docker-compose.yml) | **include** stack + **build** ZooMeet from source |
-| [`docker-compose.hub.yml`](docker-compose.hub.yml) | **include** stack + **pull** ZooMeet from Docker Hub |
+| File                                                   | Role                                                 |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| [`docker-compose.stack.yml`](docker-compose.stack.yml) | LiveKit + Valkey + `dokploy-network` (shared)        |
+| [`docker-compose.yml`](docker-compose.yml)             | **include** stack + **build** ZooMeet from source    |
+| [`docker-compose.hub.yml`](docker-compose.hub.yml)     | **include** stack + **pull** ZooMeet from Docker Hub |
 
 Set **`ZOOMEET_IMAGE`** to the image you pushed, e.g. `anatoliydev7/zoomeet:latest`, and use **`docker-compose.hub.yml`** as the compose file (Dokploy or local). Still set **`LIVEKIT_*`** and **`PUBLIC_LIVEKIT_URL`** the same way as below.
 
@@ -150,7 +155,7 @@ You can run **each image as its own Dokploy application** (Docker source) instea
        ```yaml
        port: 7880
        bind_addresses:
-         - ""
+         - ''
        rtc:
          tcp_port: 7881
          port_range_start: 50000
@@ -159,8 +164,8 @@ You can run **each image as its own Dokploy application** (Docker source) instea
          enable_loopback_candidate: true
        redis:
          address: YOUR_VALKEY_HOST:6379
-         username: ""
-         password: ""
+         username: ''
+         password: ''
          db: 0
        ```
 
@@ -214,11 +219,11 @@ You can run **each image as its own Dokploy application** (Docker source) instea
 
 ### Troubleshooting
 
-| Symptom | Things to check |
-|--------|-------------------|
-| `401` / invalid token | `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` in Dokploy wrong or changed without redeploy; must match rendered `keys:` |
-| WebSocket fails | `PUBLIC_LIVEKIT_URL` must match the public **`wss://`** host; TLS and DNS for the LiveKit domain |
-| LiveKit can’t reach Redis | **`YOUR_VALKEY_HOST`** wrong for separate apps; all services must share **`dokploy-network`** |
+| Symptom                   | Things to check                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `401` / invalid token     | `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` in Dokploy wrong or changed without redeploy; must match rendered `keys:` |
+| WebSocket fails           | `PUBLIC_LIVEKIT_URL` must match the public **`wss://`** host; TLS and DNS for the LiveKit domain                   |
+| LiveKit can’t reach Redis | **`YOUR_VALKEY_HOST`** wrong for separate apps; all services must share **`dokploy-network`**                      |
 
 Official reference: [Dokploy Docker Compose](https://docs.dokploy.com/docs/core/docker-compose).
 

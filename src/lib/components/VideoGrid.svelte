@@ -42,7 +42,13 @@
 		return participants.map((p, i) => {
 			const pos = grid.getPosition(i);
 			const size = grid.getItemDimensions(i);
-			return { participant: p, top: pos.top, left: pos.left, width: size.width, height: size.height };
+			return {
+				participant: p,
+				top: pos.top,
+				left: pos.left,
+				width: size.width,
+				height: size.height,
+			};
 		});
 	});
 
@@ -51,7 +57,7 @@
 	}
 </script>
 
-<div bind:this={container} class="relative w-full h-full">
+<div bind:this={container} class="relative h-full w-full">
 	{#each itemLayouts as item (item.participant.sid || item.participant.identity)}
 		<div
 			class="absolute transition-all duration-300 ease-in-out"

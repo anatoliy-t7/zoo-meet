@@ -7,7 +7,7 @@ declare global {
 			locale: Language;
 		}
 		interface PageData {
-			      locale: Language;
+			locale: Language;
 		}
 		// interface PageState {}
 		// interface Platform {}
