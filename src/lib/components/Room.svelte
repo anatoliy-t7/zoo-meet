@@ -28,6 +28,10 @@
 		(lkState.trackChangeCount, lkState.room?.localParticipant ?? null)
 	);
 
+	$effect(() => {
+		lkState.setChatSidebarOpen(activeSidebar === 'chat');
+	});
+
 	function toggleSidebar(panel: NonNullable<Sidebar>) {
 		activeSidebar = activeSidebar === panel ? null : panel;
 	}
@@ -83,7 +87,7 @@
 		<div class="flex min-w-0 flex-1 flex-col">
 			<!-- Top status badges -->
 			<div
-				class="pointer-events-none absolute top-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2"
+				class="pointer-events-none absolute top-2 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 sm:top-4"
 			>
 				{#if lkState.isLocked}
 					<div
@@ -95,14 +99,14 @@
 				{/if}
 			</div>
 
-			<div class="flex-1 overflow-hidden p-4 pb-0">
+			<div class="flex-1 overflow-hidden p-2 pb-0 sm:p-4 sm:pb-0">
 				<VideoGrid {lkState} {hideSelf} />
 			</div>
 
 			<!-- Floating self-view PiP while screensharing -->
 			{#if lkState.isScreenSharing && floatingThumbnail && !hideSelf && localParticipant}
 				<div
-					class="absolute right-6 bottom-6 z-10 h-36 w-56 overflow-hidden rounded-xl shadow-2xl ring-2 ring-white/20"
+					class="absolute right-3 bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] z-10 h-28 w-40 overflow-hidden rounded-lg shadow-2xl ring-2 ring-white/20 sm:right-6 sm:bottom-6 sm:h-36 sm:w-56 sm:rounded-xl"
 				>
 					<ParticipantTile participant={localParticipant} {lkState} isActiveSpeaker={false} />
 				</div>
@@ -110,8 +114,16 @@
 		</div>
 
 		{#if activeSidebar}
+			<button
+				type="button"
+				class="fixed inset-0 z-30 bg-black/50 sm:hidden"
+				aria-label="Close panel"
+				onclick={() => (activeSidebar = null)}
+			>
+				<span class="sr-only">Close panel</span>
+			</button>
 			<div
-				class="bg-popover m-4 w-96 rounded-xl"
+				class="bg-popover fixed inset-0 z-40 m-0 flex max-h-none flex-col overflow-hidden rounded-none sm:relative sm:inset-auto sm:z-auto sm:m-4 sm:max-h-[min(calc(100vh-2rem),calc(100dvh-2rem))] sm:w-96 sm:shrink-0 sm:overflow-hidden sm:rounded-xl"
 				transition:fly={{ x: 320, duration: 220, opacity: 1 }}
 			>
 				<!-- Sidebar panel -->

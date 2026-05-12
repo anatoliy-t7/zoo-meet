@@ -33,6 +33,8 @@ const inboundLockSchema = z.object({
 const inboundReactionSchema = z.object({
 	type: z.literal('reaction'),
 	emoji: z.string().min(1).max(10),
+	/** Fallback when DataReceived omits participant (rare); must match sender when participant is present. */
+	from: z.string().min(1).max(256).optional(),
 });
 
 const inboundRaiseHandSchema = z.object({
@@ -64,6 +66,10 @@ export class LiveKitState {
 	activeReactions: SvelteMap<string, string> = new SvelteMap();
 	/** Participant identities that have raised their hand. */
 	raisedHands: SvelteSet<string> = new SvelteSet();
+	/** Count of inbound chat messages received while the chat sidebar was closed (cleared on open). */
+	unreadChatCount: number = $state(0);
+	/** Mirrors whether the Chat sidebar is visible; drives unread tally. */
+	chatSidebarOpen: boolean = $state(false);
 
 	/** Per-identity timers for clearing reactions. Not reactive — internal only. */
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive timer map
@@ -142,6 +148,9 @@ export class LiveKitState {
 							timestamp: Date.now(),
 							isLocal: false,
 						});
+						if (!this.chatSidebarOpen) {
+							this.unreadChatCount++;
+						}
 						return;
 					}
 
@@ -152,8 +161,10 @@ export class LiveKitState {
 					}
 
 					const reaction = inboundReactionSchema.safeParse(raw);
-					if (reaction.success && participant?.identity) {
-						this.applyReaction(participant.identity, reaction.data.emoji);
+					if (reaction.success) {
+						const identity = participant?.identity ?? reaction.data.from;
+						if (!identity) return;
+						this.applyReaction(identity, reaction.data.emoji);
 						return;
 					}
 
@@ -197,8 +208,18 @@ export class LiveKitState {
 		this.isLocked = false;
 		this.activeReactions.clear();
 		this.raisedHands.clear();
+		this.unreadChatCount = 0;
+		this.chatSidebarOpen = false;
 		this.reactionTimers.forEach((t) => clearTimeout(t));
 		this.reactionTimers.clear();
+	}
+
+	/** Call when Chat panel opens or closes; clears unread only when opened. */
+	setChatSidebarOpen(open: boolean) {
+		this.chatSidebarOpen = open;
+		if (open) {
+			this.unreadChatCount = 0;
+		}
 	}
 
 	/** Schedule an emoji reaction to disappear from a tile after 5 s. */
@@ -214,12 +235,14 @@ export class LiveKitState {
 	}
 
 	/** Send a floating emoji reaction visible to all participants for 5 seconds. */
-	sendReaction(emoji: string) {
+	async sendReaction(emoji: string) {
 		if (!this.room) return;
 		const identity = this.room.localParticipant.identity;
 		this.applyReaction(identity, emoji);
-		const payload = new TextEncoder().encode(JSON.stringify({ type: 'reaction', emoji }));
-		this.room.localParticipant.publishData(payload, { reliable: false });
+		const payload = new TextEncoder().encode(
+			JSON.stringify({ type: 'reaction', emoji, from: identity })
+		);
+		await this.room.localParticipant.publishData(payload, { reliable: true });
 	}
 
 	/** Toggle raise-hand state and broadcast to all participants. */
