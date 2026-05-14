@@ -110,6 +110,10 @@ export class LiveKitState {
 		const roomOptions: RoomOptions = {
 			adaptiveStream: true,
 			dynacast: true,
+			publishDefaults: {
+				videoCodec: 'vp9',
+				backupCodec: true,
+			},
 			videoCaptureDefaults: {
 				resolution: { width: 1280, height: 720, frameRate: 30 },
 			},
