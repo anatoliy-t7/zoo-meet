@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { PUBLIC_BRAND_NAME, PUBLIC_ENABLE_TRACKING } from '$env/static/public';
 	import '../app.css';
+	import { page } from '$app/state';
 
 	let { children } = $props();
 
@@ -14,11 +13,11 @@
 
 <svelte:head>
 	<meta name="theme-color" content="#181818" />
-	<meta property="og:site_name" content={PUBLIC_BRAND_NAME} />
+	<meta property="og:site_name" content={page.data.brandName} />
 	<meta property="og:type" content="website" />
 	<meta name="twitter:card" content="summary_large_image" />
 
-	{#if PUBLIC_ENABLE_TRACKING}
+	{#if page.data.enableTracking}
 		<script
 			defer
 			src="https://cloud.umami.is/script.js"
