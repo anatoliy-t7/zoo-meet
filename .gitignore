@@ -25,3 +25,6 @@ vite.config.ts.timestamp-*
 
 # MediaPipe wasm (copied from node_modules on install)
 static/mediapipe/
+
+# Generated at install/build time
+src/lib/generated/

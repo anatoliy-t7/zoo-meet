@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { PUBLIC_BRAND_NAME } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import { generateRoomId } from '$lib/utils/id';
 	import Icon from '$lib/components/Icon.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -55,12 +55,12 @@
 </script>
 
 <svelte:head>
-	<title>{t('home.title', { brandName: PUBLIC_BRAND_NAME })}</title>
+	<title>{t('home.title', { brandName: env.PUBLIC_BRAND_NAME })}</title>
 	<meta name="description" content={t('home.meta_description')} />
-	<meta property="og:title" content={t('home.title', { brandName: PUBLIC_BRAND_NAME })} />
+	<meta property="og:title" content={t('home.title', { brandName: env.PUBLIC_BRAND_NAME })} />
 	<meta property="og:description" content={t('home.og_description')} />
 	<meta property="og:image" content="/hero.webp" />
-	<meta name="twitter:title" content={t('home.title', { brandName: PUBLIC_BRAND_NAME })} />
+	<meta name="twitter:title" content={t('home.title', { brandName: env.PUBLIC_BRAND_NAME })} />
 	<meta name="twitter:description" content={t('home.og_description')} />
 	<meta name="twitter:image" content="/hero.webp" />
 </svelte:head>
@@ -72,7 +72,7 @@
 				<div class="bg-primary flex size-8 items-center justify-center rounded-full">
 					<Icon icon={Video01Icon} size={18} color="black" />
 				</div>
-				<span class="text-lg font-semibold tracking-tight">{PUBLIC_BRAND_NAME}</span>
+				<span class="text-lg font-semibold tracking-tight">{env.PUBLIC_BRAND_NAME}</span>
 			</div>
 
 			<a
@@ -137,7 +137,7 @@
 			<div class="relative overflow-hidden rounded-2xl shadow-2xl">
 				<img
 					src="/hero.webp"
-					alt="{PUBLIC_BRAND_NAME} video call interface"
+					alt="{env.PUBLIC_BRAND_NAME} video call interface"
 					class="w-full object-cover"
 					fetchpriority="high"
 				/>
@@ -169,11 +169,14 @@
 				<div class="bg-primary flex size-6 items-center justify-center rounded-full">
 					<Icon icon={Video01Icon} size={13} color="black" />
 				</div>
-				<span class="text-sm font-semibold">{PUBLIC_BRAND_NAME}</span>
+				<span class="text-sm font-semibold">{env.PUBLIC_BRAND_NAME}</span>
 				<span class="text-muted-foreground text-sm">{t('home.footer_tagline')}</span>
 			</div>
 
-			<div class="text-muted-foreground flex items-center gap-6 text-sm">
+			<div
+				class="text-muted-foreground flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm sm:justify-end"
+			>
+				<span>v{page.data.appVersion}</span>
 				<a
 					href="https://github.com/anatoliy-t7/zoo-meet"
 					target="_blank"
@@ -190,7 +193,7 @@
 				<span
 					>{t('home.footer_copyright', {
 						year: new Date().getFullYear(),
-						brandName: PUBLIC_BRAND_NAME,
+						brandName: env.PUBLIC_BRAND_NAME,
 					})}</span
 				>
 			</div>

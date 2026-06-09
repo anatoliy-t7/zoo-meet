@@ -1,13 +1,14 @@
 {
 	"name": "app",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.1.2",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync || echo '' && node scripts/copy-mediapipe-wasm.mjs",
+		"prepare": "svelte-kit sync || echo '' && node scripts/copy-mediapipe-wasm.mjs && node scripts/generate-app-version.mjs",
+		"prebuild": "node scripts/generate-app-version.mjs",
 		"check": "eslint . --fix && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "eslint .",

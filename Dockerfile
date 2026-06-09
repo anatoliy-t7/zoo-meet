@@ -13,6 +13,11 @@ RUN pnpm install --frozen-lockfile --prefer-offline
 
 COPY . .
 
+# .dockerignore excludes .git — pass commit-specific version from CI/local build.
+ARG APP_VERSION
+ENV APP_VERSION=${APP_VERSION}
+RUN node scripts/generate-app-version.mjs
+
 RUN pnpm run build
 
 FROM node:25-alpine
