@@ -8,6 +8,7 @@ RUN npm install -g pnpm@latest
 ENV CI=true
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY scripts/ scripts/
 RUN pnpm install --frozen-lockfile --prefer-offline
 
 COPY . .
