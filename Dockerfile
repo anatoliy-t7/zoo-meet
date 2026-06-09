@@ -15,7 +15,9 @@ COPY . .
 
 # Must be present at build time for $env/static/public (SvelteKit).
 ARG PUBLIC_BRAND_NAME=ZooMeet
+ARG PUBLIC_ENABLE_TRACKING=false
 ENV PUBLIC_BRAND_NAME=${PUBLIC_BRAND_NAME}
+ENV PUBLIC_ENABLE_TRACKING=${PUBLIC_ENABLE_TRACKING}
 
 RUN pnpm run build
 
