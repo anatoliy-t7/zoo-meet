@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy, tick } from 'svelte';
 	import { MagicLineRenderer } from '$lib/gestures/magic-line-renderer';
+	import { emptyMagicStrokeView } from '$lib/gestures/magic-stroke-sync';
 	import { getParticipantStrokePalette } from '$lib/gestures/participant-color';
 	import type { LiveKitState } from '$lib/livekit/store.svelte';
 
@@ -20,7 +21,9 @@
 	let renderer = $state<MagicLineRenderer | null>(null);
 	let resizeObserver: ResizeObserver | null = null;
 
-	let strokeView = $derived(lkState.getMagicStrokes(participantIdentity));
+	let strokeView = $derived(
+		lkState.magicStrokes.get(participantIdentity) ?? emptyMagicStrokeView(),
+	);
 	let strokePalette = $derived(getParticipantStrokePalette(participantIdentity));
 
 	const syncCanvasSize = () => {

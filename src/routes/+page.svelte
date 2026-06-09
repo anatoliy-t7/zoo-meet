@@ -107,7 +107,7 @@
 					{t('home.new_meeting')}
 				</Button>
 
-				<div class="relative flex flex-1">
+				<div class="group relative flex flex-1">
 					<div
 						class="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"
 					>

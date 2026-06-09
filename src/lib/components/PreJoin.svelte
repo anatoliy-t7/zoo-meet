@@ -25,6 +25,8 @@
 
 	let t = $derived(page.data.t);
 
+	const cameraResolution = { width: 1280, height: 720, frameRate: 30 };
+
 	let { onJoin } = $props<{
 		onJoin: (name: string, videoTrack?: LocalVideoTrack, audioTrack?: LocalAudioTrack) => void;
 	}>();
@@ -64,7 +66,7 @@
 		// Always request both devices on load — triggers the browser permission prompt
 		// on first visit and silently auto-enables on return visits.
 		const [videoResult, audioResult] = await Promise.allSettled([
-			createLocalVideoTrack(),
+			createLocalVideoTrack({ resolution: cameraResolution }),
 			createLocalAudioTrack(),
 		]);
 
@@ -102,6 +104,7 @@
 			try {
 				videoTrack = await createLocalVideoTrack({
 					deviceId: selectedVideoDevice,
+					resolution: cameraResolution,
 				});
 				isVideoEnabled = true;
 			} catch (e) {

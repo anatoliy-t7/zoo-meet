@@ -4,7 +4,12 @@ import {
 	type GestureRecognizerResult,
 } from '@mediapipe/tasks-vision';
 
-import { mapNormalizedToCanvas } from './coordinates';
+import {
+	computeLetterboxLayout,
+	mapLetterboxToVideoNormalized,
+	mapNormalizedToCanvas,
+	type LetterboxLayout,
+} from './coordinates';
 import { HandTracker } from './hand-tracker';
 import {
 	getIndexFingertip,
@@ -19,7 +24,7 @@ import { StrokeBroadcaster } from './stroke-broadcaster';
 
 const MODEL_URL =
 	'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task';
-const INFER_WIDTH = 320;
+const INFER_SIZE = 480;
 const DETECTION_COAST_MS = 450;
 const MAX_PREDICT_AFTER_DETECT_MS = 600;
 
@@ -52,6 +57,7 @@ export class GestureEngine {
 	private activeHandIds = new Set<number>();
 	private prevActiveHandIds = new Set<number>();
 	private inferCanvas: HTMLCanvasElement | null = null;
+	private letterboxLayout: LetterboxLayout | null = null;
 	private isDetecting = false;
 
 	constructor(
@@ -104,6 +110,7 @@ export class GestureEngine {
 		this.lineRenderer?.destroy();
 		this.lineRenderer = null;
 		this.inferCanvas = null;
+		this.letterboxLayout = null;
 		this.handTracker.reset();
 		this.handMotion.clear();
 		this.handTrackState.clear();
@@ -121,10 +128,32 @@ export class GestureEngine {
 		}
 
 		if (this.inferCanvas && this.video.videoWidth > 0 && this.video.videoHeight > 0) {
-			const aspect = this.video.videoHeight / this.video.videoWidth;
-			this.inferCanvas.width = INFER_WIDTH;
-			this.inferCanvas.height = Math.max(1, Math.round(INFER_WIDTH * aspect));
+			this.inferCanvas.width = INFER_SIZE;
+			this.inferCanvas.height = INFER_SIZE;
+			this.letterboxLayout = computeLetterboxLayout(
+				this.video.videoWidth,
+				this.video.videoHeight,
+				INFER_SIZE,
+			);
 		}
+	}
+
+	/** Draw the current video frame letterboxed into the square inference canvas. */
+	private drawInferenceFrame(ctx: CanvasRenderingContext2D) {
+		const layout = this.letterboxLayout;
+		if (!layout) {
+			return;
+		}
+
+		ctx.fillStyle = '#000';
+		ctx.fillRect(0, 0, INFER_SIZE, INFER_SIZE);
+		ctx.drawImage(
+			this.video,
+			layout.offsetX,
+			layout.offsetY,
+			layout.drawWidth,
+			layout.drawHeight,
+		);
 	}
 
 	private async createRecognizer(): Promise<GestureRecognizer> {
@@ -245,7 +274,7 @@ export class GestureEngine {
 			return;
 		}
 
-		ctx.drawImage(this.video, 0, 0, this.inferCanvas.width, this.inferCanvas.height);
+		this.drawInferenceFrame(ctx);
 		const result = this.recognizer.recognizeForVideo(this.inferCanvas, nowMs);
 		this.handleResult(result, nowMs);
 	}
@@ -280,10 +309,26 @@ export class GestureEngine {
 
 		const seenHandIds = new Set<number>();
 
+		const layout = this.letterboxLayout;
+		if (!layout || !this.lineRenderer) {
+			return;
+		}
+
 		for (let handIndex = 0; handIndex < result.landmarks.length; handIndex++) {
 			const landmarks = result.landmarks[handIndex] as readonly HandLandmark[];
 			const tip = getIndexFingertip(landmarks);
-			const mapped = mapNormalizedToCanvas(tip.x, tip.y, this.video, this.canvas, this.mirrored);
+			const videoNorm = mapLetterboxToVideoNormalized(tip.x, tip.y, layout);
+			if (!videoNorm) {
+				continue;
+			}
+
+			const mapped = mapNormalizedToCanvas(
+				videoNorm.nx,
+				videoNorm.ny,
+				this.video,
+				this.canvas,
+				this.mirrored,
+			);
 			const handId = this.handTracker.match(mapped.x, mapped.y, nowMs);
 
 			const trackState = this.handTrackState.get(handId) ?? {
@@ -308,7 +353,8 @@ export class GestureEngine {
 
 				trackState.lastOpenMs = nowMs;
 				this.updateHandMotion(handId, mapped.x, mapped.y, nowMs);
-				this.broadcaster?.push(handId, tip.x, tip.y);
+				this.lineRenderer.addPixelPoint(handId, mapped.x, mapped.y, nowMs);
+				this.broadcaster?.push(handId, videoNorm.nx, videoNorm.ny);
 
 				trackState.tracking = true;
 				frameActiveHands.add(handId);

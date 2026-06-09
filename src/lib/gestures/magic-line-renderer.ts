@@ -237,6 +237,8 @@ export class MagicLineRenderer {
 		for (const points of this.activeStrokes.values()) {
 			if (points.length >= 2) {
 				this.drawSmoothStroke(ctx, points, 1);
+			} else if (points.length === 1) {
+				this.drawStrokeTip(ctx, points[0]!, 1);
 			}
 
 			const tip = points.at(-1);
@@ -251,6 +253,19 @@ export class MagicLineRenderer {
 		if (this.strokes.length > 0 || hasActive || this.sparkleEmitter.hasParticles) {
 			this.scheduleDraw();
 		}
+	}
+
+	/** Draw a glowing dot at the fingertip before the stroke has enough points for a curve. */
+	private drawStrokeTip(ctx: CanvasRenderingContext2D, point: Point, opacity: number) {
+		ctx.save();
+		ctx.globalAlpha = opacity;
+		ctx.fillStyle = this.palette.mid;
+		ctx.shadowColor = this.palette.glow;
+		ctx.shadowBlur = SHADOW_BLUR;
+		ctx.beginPath();
+		ctx.arc(point.x, point.y, LINE_WIDTH / 2, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.restore();
 	}
 
 	/** Draw a flowing curve using Chaikin smoothing + Catmull-Rom splines. */

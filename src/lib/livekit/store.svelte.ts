@@ -370,7 +370,8 @@ export class LiveKitState {
 			}),
 		);
 
-		this.room.localParticipant.publishData(payload, { reliable: !!batch.final });
+		// Always use reliable delivery — lossy packets are frequently dropped over TURN in production.
+		this.room.localParticipant.publishData(payload, { reliable: true });
 	}
 
 	/** Returns the current magic-line snapshot for a participant tile. */
