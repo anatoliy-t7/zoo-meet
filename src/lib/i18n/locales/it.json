@@ -80,6 +80,8 @@
 	"settings.lock_description": "Impedisci a nuovi partecipanti di unirsi",
 	"settings.video": "Video",
 	"settings.bg_blur": "Sfocatura dello sfondo",
+	"settings.gesture_effects": "Effetti gestuali",
+	"settings.gesture_effects_description": "Disegna linee magiche muovendo il dito indice",
 	"settings.incoming_off": "Disattiva video in entrata",
 	"settings.hide_self": "Nascondi la mia vista",
 	"settings.floating_thumb": "Miniatura mobile durante la condivisione schermo",

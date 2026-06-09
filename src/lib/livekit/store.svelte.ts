@@ -11,6 +11,13 @@ import {
 import { BackgroundBlur, supportsBackgroundProcessors } from '@livekit/track-processors';
 import { z } from 'zod';
 
+import { MagicStrokeStore } from '$lib/gestures/magic-stroke-store';
+import {
+	emptyMagicStrokeView,
+	inboundMagicStrokeSchema,
+	type MagicStrokeView,
+	type OutboundMagicStroke,
+} from '$lib/gestures/magic-stroke-sync';
 import { isMeetingRoomLockedFromMetadata } from '$lib/livekit/meeting-room-metadata';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
@@ -62,12 +69,16 @@ export class LiveKitState {
 	e2eeEnabled: boolean = $state(false);
 	/** Whether the background blur processor is active. */
 	isBlurEnabled: boolean = $state(false);
+	/** Whether hand-gesture effects are active on the local camera. */
+	isGestureEnabled: boolean = $state(true);
 	/** Whether the meeting is locked (no new participants). */
 	isLocked: boolean = $state(false);
 	/** Active emoji reactions keyed by participant identity. Cleared after 5 s. */
 	activeReactions: SvelteMap<string, string> = new SvelteMap();
 	/** Participant identities that have raised their hand. */
 	raisedHands: SvelteSet<string> = new SvelteSet();
+	/** Shared magic-line overlays keyed by participant identity. */
+	magicStrokes: SvelteMap<string, MagicStrokeView> = new SvelteMap();
 	/** Count of inbound chat messages received while the chat sidebar was closed (cleared on open). */
 	unreadChatCount: number = $state(0);
 	/** Mirrors whether the Chat sidebar is visible; drives unread tally. */
@@ -80,6 +91,8 @@ export class LiveKitState {
 	/** Per-identity timers for clearing reactions. Not reactive — internal only. */
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive timer map
 	private reactionTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+	 
+	private magicStrokeStore = new MagicStrokeStore();
 
 	private updateParticipants() {
 		if (!this.room) return;
@@ -142,7 +155,11 @@ export class LiveKitState {
 					void this.publishLockState(true);
 				}
 			})
-			.on(RoomEvent.ParticipantDisconnected, () => this.updateParticipants())
+			.on(RoomEvent.ParticipantDisconnected, (participant) => {
+				this.magicStrokeStore.removeParticipant(participant.identity);
+				this.magicStrokes.delete(participant.identity);
+				this.updateParticipants();
+			})
 			.on(RoomEvent.TrackSubscribed, () => this.triggerTrackChange())
 			.on(RoomEvent.TrackUnsubscribed, () => this.triggerTrackChange())
 			.on(RoomEvent.LocalTrackPublished, () => this.triggerTrackChange())
@@ -195,6 +212,17 @@ export class LiveKitState {
 						} else {
 							this.raisedHands.delete(participant.identity);
 						}
+						return;
+					}
+
+					const magicStroke = inboundMagicStrokeSchema.safeParse(raw);
+					if (magicStroke.success) {
+						const localIdentity = this.room?.localParticipant.identity;
+						if (magicStroke.data.from === localIdentity) {
+							return;
+						}
+						const view = this.magicStrokeStore.applyInbound(magicStroke.data);
+						this.magicStrokes.set(magicStroke.data.from, view);
 					}
 				} catch {
 					// Malformed packet — silently drop
@@ -233,6 +261,8 @@ export class LiveKitState {
 		this.roomSlug = null;
 		this.activeReactions.clear();
 		this.raisedHands.clear();
+		this.magicStrokes.clear();
+		this.magicStrokeStore.clear();
 		this.unreadChatCount = 0;
 		this.chatSidebarOpen = false;
 		this.reactionTimers.forEach((t) => clearTimeout(t));
@@ -315,6 +345,37 @@ export class LiveKitState {
 		const enabled = this.room.localParticipant.isScreenShareEnabled;
 		await this.room.localParticipant.setScreenShareEnabled(!enabled);
 		this.triggerTrackChange();
+	}
+
+	/** Enable or disable hand-gesture effects on the local camera. */
+	setGestureEnabled(enabled: boolean) {
+		this.isGestureEnabled = enabled;
+	}
+
+	/** Broadcast a magic-line stroke batch to other participants. */
+	publishMagicStroke(batch: OutboundMagicStroke) {
+		if (!this.room?.localParticipant || !this.isGestureEnabled) {
+			return;
+		}
+
+		const from = this.room.localParticipant.identity;
+		const payload = new TextEncoder().encode(
+			JSON.stringify({
+				type: 'magic-stroke',
+				from,
+				handId: batch.handId,
+				strokeId: batch.strokeId,
+				points: batch.points,
+				...(batch.final ? { final: true, expiresAt: batch.expiresAt } : {}),
+			}),
+		);
+
+		this.room.localParticipant.publishData(payload, { reliable: !!batch.final });
+	}
+
+	/** Returns the current magic-line snapshot for a participant tile. */
+	getMagicStrokes(identity: string): MagicStrokeView {
+		return this.magicStrokes.get(identity) ?? emptyMagicStrokeView();
 	}
 
 	/** Apply or remove the background blur processor on the local camera track. */

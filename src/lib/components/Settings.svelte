@@ -39,6 +39,12 @@
 		await lkState.toggleBackgroundBlur(v);
 	}
 
+	let gestureEffects = $derived(lkState.isGestureEnabled);
+
+	function handleGestureChange(v: boolean) {
+		lkState.setGestureEnabled(v);
+	}
+
 	let turnOffIncoming = $state(false);
 	function handleIncomingVideoChange(v: boolean) {
 		turnOffIncoming = v;
@@ -145,6 +151,22 @@
 							checked={backgroundBlur}
 							onCheckedChange={handleBlurChange}
 							aria-label={t('settings.bg_blur')}
+						/>
+					</div>
+					<div class="flex items-center justify-between gap-4">
+						<div>
+							<Label for="gesture-effects" class="cursor-pointer font-normal"
+								>{t('settings.gesture_effects')}</Label
+							>
+							<p class="text-muted-foreground mt-0.5 text-xs">
+								{t('settings.gesture_effects_description')}
+							</p>
+						</div>
+						<Switch
+							id="gesture-effects"
+							checked={gestureEffects}
+							onCheckedChange={handleGestureChange}
+							aria-label={t('settings.gesture_effects')}
 						/>
 					</div>
 					<div class="flex items-center justify-between">

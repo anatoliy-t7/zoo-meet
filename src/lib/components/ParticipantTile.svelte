@@ -3,6 +3,8 @@
 	import { Track, type Participant } from 'livekit-client';
 	import type { LiveKitState } from '$lib/livekit/store.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import GestureOverlay from '$lib/components/GestureOverlay.svelte';
+	import RemoteGestureOverlay from '$lib/components/RemoteGestureOverlay.svelte';
 	import { MicOff01Icon } from '@hugeicons/core-free-icons';
 	import { page } from '$app/state';
 
@@ -72,6 +74,17 @@
 			muted={participant.isLocal}
 			playsinline
 		></video>
+		{#if !screenTrack && videoTrack && lkState.isGestureEnabled}
+			{#if participant.isLocal}
+				<GestureOverlay {videoElement} {lkState} enabled={lkState.isGestureEnabled} mirrored />
+			{:else}
+				<RemoteGestureOverlay
+					{videoElement}
+					participantIdentity={participant.identity}
+					{lkState}
+				/>
+			{/if}
+		{/if}
 	{:else}
 		<div class="bg-meet-card flex h-full w-full items-center justify-center">
 			<div

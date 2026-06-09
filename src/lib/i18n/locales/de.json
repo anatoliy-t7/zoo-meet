@@ -80,6 +80,8 @@
 	"settings.lock_description": "Neue Teilnehmer am Beitreten hindern",
 	"settings.video": "Video",
 	"settings.bg_blur": "Hintergrundunschärfe",
+	"settings.gesture_effects": "Gesteneffekte",
+	"settings.gesture_effects_description": "Zeichne magische Linien, indem du deinen Zeigefinger bewegst",
 	"settings.incoming_off": "Eingehendes Video deaktivieren",
 	"settings.hide_self": "Eigenansicht ausblenden",
 	"settings.floating_thumb": "Schwebendes Vorschaubild beim Bildschirmteilen",

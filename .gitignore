@@ -22,3 +22,6 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .pnpm-store
+
+# MediaPipe wasm (copied from node_modules on install)
+static/mediapipe/

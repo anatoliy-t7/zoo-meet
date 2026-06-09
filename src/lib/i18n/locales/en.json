@@ -80,6 +80,8 @@
 	"settings.lock_description": "Prevent new participants from joining",
 	"settings.video": "Video",
 	"settings.bg_blur": "Background blur",
+	"settings.gesture_effects": "Gesture effects",
+	"settings.gesture_effects_description": "Draw magic lines by moving your index finger",
 	"settings.incoming_off": "Turn off incoming video",
 	"settings.hide_self": "Hide self view",
 	"settings.floating_thumb": "Floating thumbnail during screenshare",
