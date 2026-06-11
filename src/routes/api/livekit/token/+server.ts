@@ -5,6 +5,7 @@ import { isMeetingRoomLockedFromMetadata } from '$lib/livekit/meeting-room-metad
 import { LIVEKIT_ROOM_MAX_LENGTH, isValidLivekitRoomId } from '$lib/server/livekit-room-id';
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
 import { json } from '@sveltejs/kit';
+import { randomBytes } from 'node:crypto';
 import type { RequestHandler } from './$types';
 
 const MAX_NAME_LENGTH = 100;
@@ -50,7 +51,8 @@ export const POST: RequestHandler = async ({ request }) => {
 					isMeetingRoomLockedFromMetadata(existing.metadata)
 				) {
 					const participants = await roomSvc.listParticipants(cleanRoom);
-					const alreadyInRoom = participants.some((p) => p.identity === cleanName);
+					// Compare by display name (p.name) since identities now include a unique suffix
+					const alreadyInRoom = participants.some((p) => p.name === cleanName);
 					if (!alreadyInRoom) {
 						return json({ error: 'Meeting is locked' }, { status: 403 });
 					}
@@ -60,10 +62,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 
+		// Append a random suffix to ensure uniqueness — two participants with the same
+		// display name will no longer collide and kick each other out.
+		const uniqueSuffix = randomBytes(4).toString('hex');
+		const uniqueIdentity = `${cleanName}-${uniqueSuffix}`;
+
 		const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
-			identity: cleanName,
+			identity: uniqueIdentity,
 			name: cleanName,
-			ttl: '4h',
+			ttl: '24h',
 		});
 		at.addGrant({ roomJoin: true, room: cleanRoom, canPublish: true, canSubscribe: true });
 

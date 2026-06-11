@@ -4,7 +4,9 @@ import type { Handle } from '@sveltejs/kit';
 const SECURITY_HEADERS: Record<string, string> = {
 	// Prevent framing (clickjacking)
 	'X-Frame-Options': 'DENY',
-	'Content-Security-Policy': "frame-ancestors 'none'",
+	// frame-ancestors blocks embedding; connect-src allows WebSocket connections to the
+	// LiveKit server (wss://) required for WebRTC signaling.
+	'Content-Security-Policy': "frame-ancestors 'none'; connect-src 'self' wss: ws:",
 
 	// Prevent MIME-type sniffing
 	'X-Content-Type-Options': 'nosniff',
@@ -16,8 +18,8 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'Permissions-Policy':
 		'camera=self, microphone=self, display-capture=self, geolocation=(), payment=()',
 
-	// HSTS — enable when behind HTTPS in production
-	// 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+	// HSTS — requires HTTPS in production; remove or disable for local HTTP dev
+	'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
 };
 
 export const handle: Handle = async ({ event, resolve }) => {

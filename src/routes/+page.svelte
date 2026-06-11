@@ -113,6 +113,7 @@
 					>
 						<Icon icon={KeyboardIcon} />
 					</div>
+
 					<Input
 						type="text"
 						bind:value={joinCode}
@@ -120,12 +121,13 @@
 						class="focus-visible:border-ring h-14 rounded-l-full rounded-r-none border-r-0 pl-14 text-lg focus-visible:ring-0"
 						placeholder={t('home.enter_code')}
 					/>
+
 					<Button
 						onclick={handleJoinMeeting}
 						disabled={!joinCode.trim()}
 						variant="secondary"
 						size="lg"
-						class="border-border rounded-l-none border border-l-0"
+						class="border-border group-focus-within:border-ring rounded-l-none border border-l-0"
 					>
 						{t('home.join')}
 					</Button>
