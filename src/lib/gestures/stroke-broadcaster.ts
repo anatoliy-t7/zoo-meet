@@ -6,6 +6,10 @@ const MIN_NORMALIZED_DISTANCE = 0.006;
 type StrokeBuffer = {
 	readonly strokeId: string;
 	points: NormalizedPoint[];
+	/** True once at least one intermediate batch has been published for this stroke. */
+	published: boolean;
+	/** Last published point — used to send a minimal final packet when buffer is empty at finalize. */
+	lastPoint?: NormalizedPoint;
 };
 
 /** Throttles and batches normalized stroke points before publishing over the data channel. */
@@ -18,7 +22,7 @@ export class StrokeBroadcaster {
 	/** Begin a new stroke segment for a hand. */
 	startStroke(handId: number, strokeId: string) {
 		this.clearTimer(handId);
-		this.buffers.set(handId, { strokeId, points: [] });
+		this.buffers.set(handId, { strokeId, points: [], published: false });
 	}
 
 	/** Queue a normalized fingertip sample for broadcast. */
@@ -65,10 +69,30 @@ export class StrokeBroadcaster {
 
 	private flush(handId: number, final: boolean, expiresAt?: number) {
 		const buffer = this.buffers.get(handId);
-		if (!buffer || buffer.points.length === 0) {
+		if (!buffer) {
 			return;
 		}
 
+		if (buffer.points.length === 0) {
+			if (final && buffer.published) {
+				// The remote has an open active entry for this stroke (we sent at least one
+				// intermediate batch) but we have no new points. Re-send the last known point
+				// as the final packet so the remote store closes and finalizes the stroke.
+				const lastPoint = buffer.lastPoint;
+				if (lastPoint) {
+					this.onPublish({
+						handId,
+						strokeId: buffer.strokeId,
+						points: [lastPoint],
+						final: true,
+						expiresAt,
+					});
+				}
+			}
+			return;
+		}
+
+		const lastPoint = buffer.points.at(-1)!;
 		const batch: OutboundMagicStroke = {
 			handId,
 			strokeId: buffer.strokeId,
@@ -77,6 +101,8 @@ export class StrokeBroadcaster {
 		};
 		this.onPublish(batch);
 		buffer.points = [];
+		buffer.published = true;
+		buffer.lastPoint = lastPoint;
 	}
 
 	private clearTimer(handId: number) {

@@ -45,7 +45,10 @@ export class MagicStrokeStore {
 		active.points.push(...packet.points);
 
 		if (packet.final && packet.expiresAt) {
-			if (active.points.length >= 2) {
+			// Move to finalized regardless of point count — the renderer already guards against
+			// drawing strokes with fewer than 2 points. Dropping short strokes here silently
+			// loses quick taps that only accumulated 1 point before the finger closed.
+			if (active.points.length >= 1) {
 				state.finalized.push({
 					points: [...active.points],
 					expiresAt: packet.expiresAt,

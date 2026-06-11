@@ -4,9 +4,11 @@ import type { Handle } from '@sveltejs/kit';
 const SECURITY_HEADERS: Record<string, string> = {
 	// Prevent framing (clickjacking)
 	'X-Frame-Options': 'DENY',
-	// frame-ancestors blocks embedding; connect-src allows WebSocket connections to the
-	// LiveKit server (wss://) required for WebRTC signaling.
-	'Content-Security-Policy': "frame-ancestors 'none'; connect-src 'self' wss: ws:",
+	// frame-ancestors blocks embedding; connect-src allows:
+	//   wss:/ws:  — LiveKit WebRTC signaling
+	//   storage.googleapis.com — MediaPipe gesture model download
+	'Content-Security-Policy':
+		"frame-ancestors 'none'; connect-src 'self' wss: ws: https://storage.googleapis.com",
 
 	// Prevent MIME-type sniffing
 	'X-Content-Type-Options': 'nosniff',

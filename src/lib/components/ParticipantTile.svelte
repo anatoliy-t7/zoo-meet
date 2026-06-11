@@ -74,10 +74,10 @@
 			muted={participant.isLocal}
 			playsinline
 		></video>
-		{#if !screenTrack && videoTrack && lkState.isGestureEnabled}
-			{#if participant.isLocal}
+		{#if !screenTrack && videoTrack}
+			{#if participant.isLocal && lkState.isGestureEnabled}
 				<GestureOverlay {videoElement} {lkState} enabled={lkState.isGestureEnabled} mirrored />
-			{:else}
+			{:else if !participant.isLocal}
 				<RemoteGestureOverlay
 					{videoElement}
 					participantIdentity={participant.identity}
@@ -90,7 +90,7 @@
 			<div
 				class="bg-primary text-primary-foreground flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold uppercase"
 			>
-				{participant.identity.charAt(0)}
+				{(participant.name || participant.identity).charAt(0)}
 			</div>
 		</div>
 	{/if}
@@ -131,7 +131,7 @@
 			<span
 				>{participant.isLocal
 					? t('participant.you_hand')
-					: participant.identity.split(' ')[0]}</span
+					: (participant.name || participant.identity).split(' ')[0]}</span
 			>
 		</div>
 	{/if}
@@ -141,7 +141,7 @@
 		<div
 			class="bg-meet-panel/80 text-meet-text flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm"
 		>
-			<span>{participant.identity}{participant.isLocal ? t('participant.you') : ''}</span>
+			<span>{participant.name || participant.identity}{participant.isLocal ? t('participant.you') : ''}</span>
 			{#if isAudioMuted}
 				<Icon icon={MicOff01Icon} size={12} color="var(--color-meet-red)" />
 			{/if}

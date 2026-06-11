@@ -59,10 +59,21 @@
 			renderer = currentRenderer;
 			syncCanvasSize();
 
-			resizeObserver = new ResizeObserver(() => syncCanvasSize());
+			// Apply any stroke data that arrived while the renderer was being set up.
+			// strokeView is read here (outside a reactive context) just to flush pending data.
+			currentRenderer.syncRemoteView(strokeView, video, mirrored);
+
+			resizeObserver = new ResizeObserver(() => {
+				syncCanvasSize();
+				// Re-render after resize so strokes previously mapped to 0×0 are redrawn correctly.
+				currentRenderer.syncRemoteView(strokeView, video, mirrored);
+			});
 			resizeObserver.observe(video);
 
-			const onMetadata = () => syncCanvasSize();
+			const onMetadata = () => {
+				syncCanvasSize();
+				currentRenderer.syncRemoteView(strokeView, video, mirrored);
+			};
 			video.addEventListener('loadedmetadata', onMetadata);
 			video.addEventListener('resize', onMetadata);
 		})();
